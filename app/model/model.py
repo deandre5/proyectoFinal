@@ -11,7 +11,11 @@ class Ejercicios:
             sql = "SELECT * FROM ejercicios"
             cursor.execute(sql)
             diccionario = cursor.fetchall()
+            diccionarios = []
+            for item in diccionario:
+                items={"id": item[0], "nombre": item[1], "descripcion": item[2], "imagen": item[3], "tipo": item[4]}
 
+                diccionarios.append(items)
             conexion.commit()
 
         except Exception as error:
@@ -19,7 +23,8 @@ class Ejercicios:
         finally:
             cursor.close()
             conexion.close()
-            return diccionario
+            print(diccionarios)
+            return diccionarios
 
     # se encarga de crear una conexion con la base de datos y mediante el id recibir toda la informacion del ejercicio
     def ConsultaId(self, id):
