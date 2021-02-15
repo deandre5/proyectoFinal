@@ -50,4 +50,4 @@ class Ejercicios:
             print(diccionarios)
             cursor.close()
             conexion.close()
-            return diccionario
+            return diccionarios
