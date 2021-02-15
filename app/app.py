@@ -11,6 +11,11 @@ CORS(app)
 
 app.secret_key = 'esto-es-una-clave-muy-secreta'
 
+
+@app.route('/')
+def index():
+    return jsonify({'status':'ok'})
+
 #metodo que tiene un id como parametro
 @app.route('/consulta/<id>', methods=['GET'])
 def consultaEjerciociosId(id):
