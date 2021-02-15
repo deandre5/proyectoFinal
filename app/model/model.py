@@ -36,12 +36,18 @@ class Ejercicios:
             sql = "SELECT * FROM ejercicios WHERE id = %s"
             cursor.execute(sql, (id))
             diccionario = cursor.fetchall()
+            diccionarios = []
+            for item in diccionario:
+                items={"id": item[0], "nombre": item[1], "descripcion": item[2], "imagen": item[3], "tipo": item[4]}
+
+                diccionarios.append(items)
 
             conexion.commit()
 
         except Exception as error:
             print("Error in the conetion with the database", error)
         finally:
+            print(diccionarios)
             cursor.close()
             conexion.close()
             return diccionario
