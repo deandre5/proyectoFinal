@@ -19,16 +19,19 @@ def index():
 # metodo que tiene un id como parametro
 
 
-@app.route('/consulta/<id>', methods=['GET'])
+@app.route('/consulta/<int:id>', methods=['GET'])
 def consultaEjerciociosId(id):
 
     # se encarga de enviar el id al controller: ConsultaEjercicios
+    
+    id = str(id)
+
     retorno = consulta_Ejercicios.consultaID(id)
 
     if retorno:
         return jsonify({'status': 'ok', 'ejercicio': retorno}), 200
     else:
-        return jsonify({'status': 'error'}), 400
+        return jsonify({'status': 'error', "message": "No existe el ejercicio"}), 400
 
 
 @app.route('/consulta', methods=['GET'])
