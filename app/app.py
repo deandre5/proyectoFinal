@@ -50,6 +50,8 @@ def consultaEjercicios():
 
     retorno = consulta_Ejercicios.consultar()
 
+    time.sleep(5)
+
     if retorno:
         return jsonify({'status': 'ok', 'ejercicios': retorno}), 200
     else:
