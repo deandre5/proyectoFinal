@@ -5,7 +5,6 @@ from app.controllers.consultaEjercicios import consulta
 from app.validators.agregarEjerciciosV import CreateExerciseSchema, UpdateExerciseSchema
 from app.controllers.agregarEjercicios import agregar
 from app.controllers.actualizarEjercicios import ActualizarEjercicios
-import time
 
 exerciseSchema = CreateExerciseSchema()
 updateExerciseSchema = UpdateExerciseSchema()
@@ -37,7 +36,6 @@ def consultaEjerciociosId(id):
 
     retorno = consulta_Ejercicios.consultaID(id)
     
-    time.sleep(1)
 
     if retorno:
         return jsonify({'status': 'ok', 'ejercicio': retorno}), 200
@@ -50,7 +48,6 @@ def consultaEjercicios():
 
     retorno = consulta_Ejercicios.consultar()
 
-    time.sleep(1)
 
     if retorno:
         return jsonify({'status': 'ok', 'ejercicios': retorno}), 200
