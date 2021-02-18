@@ -5,6 +5,7 @@ from app.controllers.consultaEjercicios import consulta
 from app.validators.agregarEjerciciosV import CreateExerciseSchema, UpdateExerciseSchema
 from app.controllers.agregarEjercicios import agregar
 from app.controllers.actualizarEjercicios import ActualizarEjercicios
+import time
 
 exerciseSchema = CreateExerciseSchema()
 updateExerciseSchema = UpdateExerciseSchema()
@@ -35,6 +36,8 @@ def consultaEjerciociosId(id):
     id = str(id)
 
     retorno = consulta_Ejercicios.consultaID(id)
+    
+    time.sleep(5)
 
     if retorno:
         return jsonify({'status': 'ok', 'ejercicio': retorno}), 200
@@ -53,6 +56,8 @@ def consultaEjercicios():
         return jsonify({'status': 'error'}), 400
 
 
+
+#metodo que recibe mediante post un json, luego valida y envia a la bd para registrar un ejercicio
 @app.route('/agregarEjercicios', methods=['POST'])
 def agregarEjercicios():
     try:
@@ -97,7 +102,7 @@ def actualizarEjercicio(id):
 
         retorno = actualizar_ejercicios.actualizar(content, id)
 
-        print(retorno,"-----------------")
+        
 
         if isinstance(retorno, str):
             return jsonify({"status": "bad", "message": "Nombre ya se encuentra registrado"}), 406
