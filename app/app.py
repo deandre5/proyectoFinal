@@ -37,7 +37,7 @@ def consultaEjerciociosId(id):
 
     retorno = consulta_Ejercicios.consultaID(id)
     
-    time.sleep(5)
+    time.sleep(1)
 
     if retorno:
         return jsonify({'status': 'ok', 'ejercicio': retorno}), 200
@@ -50,7 +50,7 @@ def consultaEjercicios():
 
     retorno = consulta_Ejercicios.consultar()
 
-    time.sleep(5)
+    time.sleep(1)
 
     if retorno:
         return jsonify({'status': 'ok', 'ejercicios': retorno}), 200
