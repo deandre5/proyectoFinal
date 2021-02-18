@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+import time
 
 from app.controllers.consultaEjercicios import consulta
 from app.validators.agregarEjerciciosV import CreateExerciseSchema, UpdateExerciseSchema
@@ -68,7 +69,7 @@ def agregarEjercicios():
 
         retorno = agregar_ejercicios.agregarEjercicios(content)
 
-        
+        time.sleep(2)
 
         if retorno:
            return jsonify({'status': 'ok'}), 200
