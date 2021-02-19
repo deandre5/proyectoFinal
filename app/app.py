@@ -6,11 +6,12 @@ from app.controllers.consultaEjercicios import consulta
 from app.validators.agregarEjerciciosV import CreateExerciseSchema, UpdateExerciseSchema
 from app.controllers.agregarEjercicios import agregar
 from app.controllers.actualizarEjercicios import ActualizarEjercicios
+from app.controllers.eliminarEjercicio import Eliminar
 
 exerciseSchema = CreateExerciseSchema()
 updateExerciseSchema = UpdateExerciseSchema()
 
-
+eliminar_ejercicio = Eliminar()
 agregar_ejercicios = agregar()
 consulta_Ejercicios = consulta()
 actualizar_ejercicios = ActualizarEjercicios()
@@ -114,3 +115,16 @@ def actualizarEjercicio(id):
     except Exception as error:
         tojson = str(error)
         return jsonify({"status": "bad", "message": tojson }), 406
+
+
+@app.route('/eliminarEjercicios/<int:id>', methods=['DELETE'])
+def eliminarEjercicios(id):
+    id = str(id)
+
+    retorno = eliminar_ejercicio.eliminar(id)
+
+    if retorno:
+        return jsonify({"status":"ok"}),200
+    
+    else:
+        return jsonify({"status":"bad", "message":"No existe el ejercicio"}),400
