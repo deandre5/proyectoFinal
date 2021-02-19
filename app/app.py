@@ -69,7 +69,7 @@ def agregarEjercicios():
 
         retorno = agregar_ejercicios.agregarEjercicios(content)
 
-        time.sleep(2)
+        
 
         if retorno:
            return jsonify({'status': 'ok'}), 200
