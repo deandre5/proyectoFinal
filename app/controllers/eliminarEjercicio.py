@@ -1,4 +1,4 @@
-from app.model.model import Ejercicios
+from app.model.ejerciciosModel import Ejercicios
 from app.controllers.consultaEjercicios import consulta
 
 consultaEjercicios = consulta()

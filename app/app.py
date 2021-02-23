@@ -3,19 +3,26 @@ from flask_cors import CORS
 import time
 
 from app.controllers.consultaEjercicios import consulta
-from app.validators.agregarEjerciciosV import CreateExerciseSchema, UpdateExerciseSchema
+
 from app.controllers.agregarEjercicios import agregar
 from app.controllers.actualizarEjercicios import ActualizarEjercicios
 from app.controllers.eliminarEjercicio import Eliminar
 
+from app.controllers.registrarRutinas import AgregarRutina
+
+from app.validators.agregarEjerciciosV import CreateExerciseSchema
+from app.validators.rutinasValidate import CreateRoutineSchema
+
 exerciseSchema = CreateExerciseSchema()
-updateExerciseSchema = UpdateExerciseSchema()
+rutinasSchema = CreateRoutineSchema()
 
 eliminar_ejercicio = Eliminar()
 agregar_ejercicios = agregar()
 consulta_Ejercicios = consulta()
 actualizar_ejercicios = ActualizarEjercicios()
 
+
+agregar_rutinas = AgregarRutina()
 app = Flask(__name__)
 CORS(app)
 
@@ -99,7 +106,7 @@ def actualizarEjercicio(id):
 
         content = request.get_json()
 
-        validar = updateExerciseSchema.load(content)
+        validar = exerciseSchema.load(content)
 
         retorno = actualizar_ejercicios.actualizar(content, id)
 
@@ -128,3 +135,37 @@ def eliminarEjercicios(id):
     
     else:
         return jsonify({"status":"bad", "message":"No existe el ejercicio"}),400
+
+
+@app.route('/registrarRutinas', methods=['POST'])
+def registrarRutinas():
+    try:
+        content = request.get_json()
+
+        validar = rutinasSchema.load(content)
+
+        retorno = agregar_rutinas.agregar(content)
+
+
+        if isinstance(retorno, str):
+            return jsonify({"status": "bad", "message": "No existe el ejercicio a registrar"}), 406
+
+        if retorno:
+           return jsonify({'status': 'ok'}), 200
+        
+        else:
+
+            status = agregar_rutinas.consulta(content)
+
+            if status:
+                return jsonify({'status': "bad", "message": "ya se encuentra registrada"}), 400
+            else:
+                return jsonify({'status': 'error', "message":"Error"}), 400
+
+
+    
+    except Exception as error:
+        tojson = str(error)
+        return jsonify({"status": "no es posible validar", "error": tojson}), 406
+
+
