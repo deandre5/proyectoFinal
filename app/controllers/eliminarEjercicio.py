@@ -5,10 +5,11 @@ consultaEjercicios = consulta()
 
 ejercicios = Ejercicios()
 
+
 class Eliminar:
 
     def eliminar(self, id):
-        
+
         consultar = ejercicios.ConsultaId(id)
 
         if len(consultar) > 0:

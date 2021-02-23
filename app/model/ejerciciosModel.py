@@ -13,7 +13,8 @@ class Ejercicios:
             diccionario = cursor.fetchall()
             diccionarios = []
             for item in diccionario:
-                items={"id": item[0], "nombre": item[1], "descripcion": item[2], "imagen": item[3], "tipo": item[4]}
+                items = {"id": item[0], "nombre": item[1],
+                         "descripcion": item[2], "imagen": item[3], "tipo": item[4]}
 
                 diccionarios.append(items)
             conexion.commit()
@@ -38,7 +39,8 @@ class Ejercicios:
             diccionario = cursor.fetchall()
             diccionarios = []
             for item in diccionario:
-                items={"id": item[0], "nombre": item[1], "descripcion": item[2], "imagen": item[3], "tipo": item[4]}
+                items = {"id": item[0], "nombre": item[1],
+                         "descripcion": item[2], "imagen": item[3], "tipo": item[4]}
 
             diccionarios.append(items)
 
@@ -67,7 +69,7 @@ class Ejercicios:
             conexion.commit()
 
             status = True
-        
+
         except Exception as error:
             print("Error in the conexion with the database", error)
 
@@ -82,32 +84,29 @@ class Ejercicios:
         try:
             conexion = psycopg2.connect(database="dd1o1liu6nsqob", user="gvjdpzhyjsvfxs", password="5ffbbd36b7bf7d3ff6e7edb572b8667da3b15d4396b445f4e705f13c25f8d075",
                                         host="ec2-52-23-190-126.compute-1.amazonaws.com", port="5432")
-            
+
             cursor = conexion.cursor()
 
             sql = "SELECT * FROM ejercicios WHERE nombre = %s"
-
-            
 
             cursor.execute(sql, (nombre,))
             diccionario = cursor.fetchall()
             conexion.commit()
 
-            
             print(diccionario)
 
             if len(diccionario) > 0:
                 status = True
             else:
                 status = False
-            
+
         except Exception as error:
             print("Error in the conetion with the database", error)
 
             status = False
 
         finally:
-            
+
             cursor.close()
             conexion.close()
             return status
@@ -118,16 +117,16 @@ class Ejercicios:
                                         host="ec2-52-23-190-126.compute-1.amazonaws.com", port="5432")
 
             cursor = conexion.cursor()
-            
+
             sql = "UPDATE ejercicios SET nombre = %s, descripcion = %s, imagen = %s, tipo = %s WHERE id = %s "
-            
+
             id = (id)
             nombre = (nombre)
             descripcion = (descripcion)
             imagen = (imagen)
             tipo = (tipo)
 
-            cursor.execute(sql,(nombre, descripcion, imagen, tipo, id))
+            cursor.execute(sql, (nombre, descripcion, imagen, tipo, id))
             conexion.commit()
             status = True
 
@@ -139,11 +138,10 @@ class Ejercicios:
             conexion.close()
             return status
 
-
-    def remover(self,id):
+    def remover(self, id):
         try:
             conexion = psycopg2.connect(database="dd1o1liu6nsqob", user="gvjdpzhyjsvfxs", password="5ffbbd36b7bf7d3ff6e7edb572b8667da3b15d4396b445f4e705f13c25f8d075",
-                                            host="ec2-52-23-190-126.compute-1.amazonaws.com", port="5432")
+                                        host="ec2-52-23-190-126.compute-1.amazonaws.com", port="5432")
 
             cursor = conexion.cursor()
 

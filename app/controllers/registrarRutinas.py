@@ -43,10 +43,9 @@ class AgregarRutina():
                 return status
 
         except Exception as error:
-            print (error)
+            print(error)
             status = False
             return status
-
 
     def consulta(self, content):
         nombre = content.get('nombre')

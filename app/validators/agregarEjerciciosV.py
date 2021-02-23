@@ -21,6 +21,3 @@ class CreateExerciseSchema(Schema):
 
     tipo = fields.String(required=True, validate=validate.Length(
         min=1, max=45), data_key='tipo')
-
-
-

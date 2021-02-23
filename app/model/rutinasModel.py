@@ -10,7 +10,8 @@ class Rutinas:
             cursor = conexion.cursor()
 
             sql = "INSERT INTO rutinas VALUES (%s, %s, %s, %s, %s, %s)"
-            datos = (id, nombre, descripcion, intensidad, dificultad, categoria)
+            datos = (id, nombre, descripcion,
+                     intensidad, dificultad, categoria)
 
             cursor.execute(sql, datos)
 
@@ -40,7 +41,8 @@ class Rutinas:
             diccionario = cursor.fetchall()
             diccionarios = []
             for item in diccionario:
-                items={"id": item[0], "nombre": item[1], "descripcion": item[2], "intensidad": item[3], "dificultad": item[4], "categoria": item[5]}
+                items = {"id": item[0], "nombre": item[1], "descripcion": item[2],
+                         "intensidad": item[3], "dificultad": item[4], "categoria": item[5]}
 
                 diccionarios.append(items)
             conexion.commit()
@@ -69,7 +71,8 @@ class Rutinas:
                 ejecucion = i.get("ejecucion")
                 dia = i.get("dia")
 
-                datos = ( id_ejercicio, repeticiones, series, ejecucion, dia, id)
+                datos = (id_ejercicio, repeticiones,
+                         series, ejecucion, dia, id)
 
                 cursor.execute(sql, datos)
 
@@ -86,8 +89,7 @@ class Rutinas:
             conexion.close()
             return status
 
-
-    def consultarNombre(self,nombre):
+    def consultarNombre(self, nombre):
         try:
             conexion = psycopg2.connect(database="dd1o1liu6nsqob", user="gvjdpzhyjsvfxs", password="5ffbbd36b7bf7d3ff6e7edb572b8667da3b15d4396b445f4e705f13c25f8d075",
                                         host="ec2-52-23-190-126.compute-1.amazonaws.com", port="5432")
@@ -96,8 +98,7 @@ class Rutinas:
 
             sql = "SELECT * FROM rutinas WHERE nombre = %s"
 
-
-            cursor.execute(sql,(nombre,))
+            cursor.execute(sql, (nombre,))
             diccionario = cursor.fetchall()
             conexion.commit()
 
@@ -105,19 +106,19 @@ class Rutinas:
                 status = True
             else:
                 status = False
-            
+
         except Exception as error:
             print("Error in the conetion with the database", error)
 
             status = False
 
         finally:
-            
+
             cursor.close()
             conexion.close()
             return status
 
-    def consultaIdEjercicio(self,ejercicios):
+    def consultaIdEjercicio(self, ejercicios):
         try:
             conexion = psycopg2.connect(database="dd1o1liu6nsqob", user="gvjdpzhyjsvfxs", password="5ffbbd36b7bf7d3ff6e7edb572b8667da3b15d4396b445f4e705f13c25f8d075",
                                         host="ec2-52-23-190-126.compute-1.amazonaws.com", port="5432")
@@ -127,14 +128,14 @@ class Rutinas:
             sql = "SELECT * FROM ejercicios WHERE id = %s"
 
             diccionarios = list()
-            
+
             for i in ejercicios:
                 id_ejercicio = i.get("id_ejercicio")
 
-                cursor.execute(sql,(id_ejercicio,))
+                cursor.execute(sql, (id_ejercicio,))
                 diccionario = cursor.fetchall()
                 conexion.commit()
-                
+
                 if len(diccionario) > 0:
                     diccionarios.append(diccionario)
 
@@ -143,14 +144,94 @@ class Rutinas:
                 status = True
             else:
                 status = False
-            
+
         except Exception as error:
             print("Error in the conetion with the database", error)
 
             status = False
 
         finally:
-            
+
+            cursor.close()
+            conexion.close()
+            return status
+
+    def asignarRutina(self, id, id_rutina):
+        try:
+            conexion = psycopg2.connect(database="dd1o1liu6nsqob", user="gvjdpzhyjsvfxs", password="5ffbbd36b7bf7d3ff6e7edb572b8667da3b15d4396b445f4e705f13c25f8d075",
+                                        host="ec2-52-23-190-126.compute-1.amazonaws.com", port="5432")
+
+            cursor = conexion.cursor()
+
+            sql = "UPDATE usuarios SET id_rutina = %s WHERE id = %s"
+
+            id = (id)
+            id_rutina = (id_rutina)
+
+            cursor.execute(sql, (id_rutina, id,))
+            conexion.commit()
+            status = True
+
+        except Exception as error:
+            print("Error in the conetion with the database", error)
+            status = False
+
+        finally:
+            cursor.close()
+            conexion.close()
+            return status
+
+    def usuario(self, id):
+        try:
+            conexion = psycopg2.connect(database="dd1o1liu6nsqob", user="gvjdpzhyjsvfxs", password="5ffbbd36b7bf7d3ff6e7edb572b8667da3b15d4396b445f4e705f13c25f8d075",
+                                        host="ec2-52-23-190-126.compute-1.amazonaws.com", port="5432")
+
+            cursor = conexion.cursor()
+            sql = "SELECT * FROM usuarios WHERE id = %s"
+
+            cursor.execute(sql, (id,))
+            diccionario = cursor.fetchall()
+
+            if len(diccionario) > 0:
+                status = True
+            else:
+                status = False
+        except Exception as error:
+            print("Error in the conetion with the database", error)
+            status = False
+
+        finally:
+            cursor.close()
+            conexion.close()
+            return status
+
+    def consultarId(self, id):
+        try:
+            conexion = psycopg2.connect(database="dd1o1liu6nsqob", user="gvjdpzhyjsvfxs", password="5ffbbd36b7bf7d3ff6e7edb572b8667da3b15d4396b445f4e705f13c25f8d075",
+                                        host="ec2-52-23-190-126.compute-1.amazonaws.com", port="5432")
+
+            cursor = conexion.cursor()
+
+            sql = "SELECT * FROM rutinas WHERE id = %s"
+
+            cursor.execute(sql, (id,))
+            diccionario = cursor.fetchall()
+            conexion.commit()
+
+            print(diccionario)
+
+            if len(diccionario) > 0:
+                status = True
+            else:
+                status = False
+
+        except Exception as error:
+            print("Error in the conetion with the database", error)
+
+            status = False
+
+        finally:
+
             cursor.close()
             conexion.close()
             return status
