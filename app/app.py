@@ -1,6 +1,9 @@
-from flask import Flask, jsonify, request
+import os
+import bcrypt
+from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
-import time
+from datetime import datetime, date, time
+from werkzeug.utils import secure_filename
 
 from app.controllers.consultaEjercicios import consulta
 
@@ -27,6 +30,7 @@ agregar_rutinas = AgregarRutina()
 asignar_rutina = Asignar()
 
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = "app/static"
 CORS(app)
 
 app.secret_key = 'esto-es-una-clave-muy-secreta'
@@ -73,7 +77,24 @@ def agregarEjercicios():
 
         validar = exerciseSchema.load(content)
 
-        retorno = agregar_ejercicios.agregarEjercicios(content)
+        f = request.files['archivo']
+
+        m = f.filename.split('.')
+
+        dia = datetime.now()
+        salt = bcrypt.gensalt()
+        hash = bcrypt.hashpw(bytes(str(dia), encoding='utf-8'), salt)
+        h = str(hash).split('/')
+        if len(h) > 2:
+            t = h[1]+h[2]
+        else:
+            t = h[0]
+        
+        filename = str(t)+"."+m[1]
+        
+        f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+        retorno = agregar_ejercicios.agregarEjercicios(content, filename)
 
         if retorno:
             return jsonify({'status': 'ok'}), 200
@@ -170,3 +191,31 @@ def asignarRutina(id, idRutina):
 
     else:
         return jsonify({"status": "bad", "message": "no existe el usuario"}), 400
+
+
+@app.route('/admin')
+def admin():
+    return render_template('admin.html')
+
+@app.route('/uploader', methods=['POST'])
+def uploader():
+    if request.method == 'POST':
+        f = request.files['archivo']
+
+        m = f.filename.split('.')
+        print (m)
+
+        dia = datetime.now()
+        salt = bcrypt.gensalt()
+        hash = bcrypt.hashpw(bytes(str(dia), encoding='utf-8'), salt)
+        h = str(hash).split('/')
+        if len(h) > 2:
+            t = h[1]+h[2]
+        else:
+            t = h[0]
+        print(h,"----------------")
+        filename = str(t)+"."+m[1]
+        
+        f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+    return "Archivo subido exitosamente"
