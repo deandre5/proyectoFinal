@@ -124,7 +124,7 @@ class Ejercicios:
             id = (id)
             nombre = (nombre)
             descripcion = (descripcion)
-            imagen = (imagen)
+            imagen = "https://proyectofinalsena.herokuapp.com/static/"+imagen
             tipo = (tipo)
 
             cursor.execute(sql, (nombre, descripcion, imagen, tipo, id))

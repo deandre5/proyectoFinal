@@ -77,7 +77,7 @@ def agregarEjercicios():
 
         validar = exerciseSchema.load(content)
 
-        f = request.files['archivo']
+        """f = request.files['archivo']
 
         m = f.filename.split('.')
 
@@ -92,9 +92,9 @@ def agregarEjercicios():
         
         filename = str(t)+"."+m[1]
         
-        f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))"""
 
-        retorno = agregar_ejercicios.agregarEjercicios(content, filename)
+        retorno = agregar_ejercicios.agregarEjercicios(content)
 
         if retorno:
             return jsonify({'status': 'ok'}), 200
@@ -108,6 +108,7 @@ def agregarEjercicios():
 
     except Exception as error:
         tojson = str(error)
+        print(tojson)
         return jsonify({"status": "no es posible validar", "error": tojson}), 406
 
 
@@ -117,6 +118,23 @@ def actualizarEjercicio(id):
         id = str(id)
 
         content = request.get_json()
+
+        """f = request.files['archivo']
+
+        m = f.filename.split('.')
+
+        dia = datetime.now()
+        salt = bcrypt.gensalt()
+        hash = bcrypt.hashpw(bytes(str(dia), encoding='utf-8'), salt)
+        h = str(hash).split('/')
+        if len(h) > 2:
+            t = h[1]+h[2]
+        else:
+            t = h[0]
+        
+        filename = str(t)+"."+m[1]
+        
+        f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))"""
 
         validar = exerciseSchema.load(content)
 
@@ -199,23 +217,28 @@ def admin():
 
 @app.route('/uploader', methods=['POST'])
 def uploader():
-    if request.method == 'POST':
-        f = request.files['archivo']
+    try:
+        if request.method == 'POST':
+            
+            f = request.files['archivo']
 
-        m = f.filename.split('.')
-        print (m)
+            m = f.filename.split('.')
+            print (m)
 
-        dia = datetime.now()
-        salt = bcrypt.gensalt()
-        hash = bcrypt.hashpw(bytes(str(dia), encoding='utf-8'), salt)
-        h = str(hash).split('/')
-        if len(h) > 2:
-            t = h[1]+h[2]
-        else:
-            t = h[0]
-        print(h,"----------------")
-        filename = str(t)+"."+m[1]
-        
-        f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            dia = datetime.now()
+            salt = bcrypt.gensalt()
+            hash = bcrypt.hashpw(bytes(str(dia), encoding='utf-8'), salt)
+            h = str(hash).split('/')
+            if len(h) > 2:
+                t = h[1]+h[2]
+            else:
+                t = h[0]
+            print(h,"----------------")
+            filename = str(t)+"."+m[1]
+            
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-    return "Archivo subido exitosamente"
+            return "Archivo subido exitosamente"
+    except Exception as error:
+        print(error)
+        return jsonify({"status": "error"}), 500
