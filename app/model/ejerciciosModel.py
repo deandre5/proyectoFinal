@@ -14,7 +14,7 @@ class Ejercicios:
             diccionarios = []
             for item in diccionario:
                 items = {"id": item[0], "nombre": item[1],
-                         "descripcion": item[2], "imagen": item[3], "tipo": item[4]}
+                         "descripcion": item[2], "imagen": str(item[3]), "tipo": item[4]}
 
                 diccionarios.append(items)
             conexion.commit()
@@ -40,7 +40,7 @@ class Ejercicios:
             diccionarios = []
             for item in diccionario:
                 items = {"id": item[0], "nombre": item[1],
-                         "descripcion": item[2], "imagen": item[3], "tipo": item[4]}
+                         "descripcion": item[2], "imagen": str(item[3]), "tipo": item[4]}
 
             diccionarios.append(items)
 
