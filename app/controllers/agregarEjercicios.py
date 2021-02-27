@@ -11,7 +11,7 @@ class agregar():
         try:
             nombre = str(content.get('nombre'))
             descripcion = str(content.get('descripcion'))
-            imagen = content.get('imagen')
+            imagen = str(content.get('imagen'))
             tipo = str(content.get('tipo'))
 
             consulta = ejercicios.consultar()
