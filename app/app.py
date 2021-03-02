@@ -232,7 +232,7 @@ def asignarRutina(id, idRutina):
         return jsonify({"status": "bad", "message": "no existe el usuario"}), 400
 
 
-"""@app.route('/admin')
+@app.route('/admin')
 def admin():
     return render_template('admin.html')
 
@@ -273,4 +273,4 @@ def uploader():
                 return "Por favor asegurese de que el nombre del archivo no incluya puntos"
     except Exception as error:
         print(error)
-        return jsonify({"status": "error"}), 500"""
+        return jsonify({"status": "error"}), 500
