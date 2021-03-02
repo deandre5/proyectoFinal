@@ -30,7 +30,7 @@ agregar_rutinas = AgregarRutina()
 asignar_rutina = Asignar()
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = "../app/static"
+app.config['UPLOAD_FOLDER'] = "../static"
 CORS(app)
 
 app.secret_key = 'esto-es-una-clave-muy-secreta'
