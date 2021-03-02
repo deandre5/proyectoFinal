@@ -7,12 +7,13 @@ ejercicios = Ejercicios()
 class agregar():
 
     # metodo que extrae la informacion del json, luego consulta que el nombre no exista y envia a la bd
-    def agregarEjercicios(self, content):
+    def agregarEjercicios(self, nombre, descripcion, tipo, filename):
         try:
-            nombre = str(content.get('nombre'))
-            descripcion = str(content.get('descripcion'))
-            imagen = str(content.get('imagen'))
-            tipo = str(content.get('tipo'))
+            nombre = str(nombre)
+            descripcion = str(descripcion)
+            imagen = str(filename)
+            print("------",imagen)
+            tipo = str(tipo)
 
             consulta = ejercicios.consultar()
 
@@ -30,8 +31,8 @@ class agregar():
             status = False
             return status
 
-    def consultar(self, content):
-        nombre = str(content.get('nombre'))
+    def consultar(self, nombre):
+        nombre = str(nombre)
 
         status = ejercicios.consultarEjercicio(nombre)
         return status

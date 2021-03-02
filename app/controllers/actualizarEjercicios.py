@@ -6,13 +6,13 @@ ejercicios = Ejercicios()
 
 class ActualizarEjercicios:
 
-    def actualizar(self, content, id):
+    def actualizar(self, nombre, descripcion,tipo, id, filename):
 
         try:
-            nombre = content.get('nombre')
-            descripcion = content.get('descripcion')
-            imagen = content.get('imagen')
-            tipo = content.get('tipo')
+            nombre = str(nombre)
+            descripcion = str(descripcion)
+            imagen = str(filename)
+            tipo = str(tipo)
 
             verificarId = ejercicios.ConsultaId(id)
 

@@ -72,35 +72,49 @@ def consultaEjercicios():
 # metodo que recibe mediante post un json, luego valida y envia a la bd para registrar un ejercicio
 @app.route('/agregarEjercicios', methods=['POST'])
 def agregarEjercicios():
-    try:
-        content = request.get_json()
+    try:       
 
-        validar = exerciseSchema.load(content)
+        #validar = exerciseSchema.load(content)
 
-        """f = request.files['archivo']
 
+        nombre = request.form['nombre']
+        descripcion = request.form['descripcion']
+        tipo = request.form['tipo']
+        print(nombre,descripcion,tipo)
+
+        f = request.files['imagen']
         m = f.filename.split('.')
 
-        dia = datetime.now()
-        salt = bcrypt.gensalt()
-        hash = bcrypt.hashpw(bytes(str(dia), encoding='utf-8'), salt)
-        h = str(hash).split('/')
-        if len(h) > 2:
-            t = h[1]+h[2]
-        else:
-            t = h[0]
-        
-        filename = str(t)+"."+m[1]
-        
-        f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))"""
+        if m[1]=="jpeg" or m[1]=="png" or m[1]=="jpg":
 
-        retorno = agregar_ejercicios.agregarEjercicios(content)
+            
+
+            dia = datetime.now()
+            salt = bcrypt.gensalt()
+            hash = bcrypt.hashpw(bytes(str(dia), encoding='utf-8'), salt)
+            h = str(hash).split('/')
+            if len(h) > 2:
+                t = h[1]+h[2]
+            else:
+                t = h[0]
+                
+            filename = str(t)+"."+m[1]
+                
+            
+        else:
+            return jsonify({"status":"bad", "message":"Asegurese de que el nombre del archivo no contenga puntos"})
+
+
+        
+
+        retorno = agregar_ejercicios.agregarEjercicios(nombre, descripcion, tipo, filename)
 
         if retorno:
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             return jsonify({'status': 'ok'}), 200
         else:
             print("********************************")
-            status = agregar_ejercicios.consultar(content)
+            status = agregar_ejercicios.consultar(nombre)
             if status:
                 return jsonify({'status': "bad", "message": "ya se encuentra registrada"}), 400
             else:
@@ -117,33 +131,40 @@ def actualizarEjercicio(id):
     try:
         id = str(id)
 
-        content = request.get_json()
+        nombre = request.form['nombre']
+        descripcion = request.form['descripcion']
+        tipo = request.form['tipo']
+        print(nombre,descripcion,tipo)
 
-        """f = request.files['archivo']
-
+        f = request.files['imagen']
         m = f.filename.split('.')
 
-        dia = datetime.now()
-        salt = bcrypt.gensalt()
-        hash = bcrypt.hashpw(bytes(str(dia), encoding='utf-8'), salt)
-        h = str(hash).split('/')
-        if len(h) > 2:
-            t = h[1]+h[2]
+        if m[1]=="jpeg" or m[1]=="png" or m[1]=="jpg":
+
+            
+
+            dia = datetime.now()
+            salt = bcrypt.gensalt()
+            hash = bcrypt.hashpw(bytes(str(dia), encoding='utf-8'), salt)
+            h = str(hash).split('/')
+            if len(h) > 2:
+                t = h[1]+h[2]
+            else:
+                t = h[0]
+                
+            filename = str(t)+"."+m[1]
+                
+            
         else:
-            t = h[0]
-        
-        filename = str(t)+"."+m[1]
-        
-        f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))"""
+            return jsonify({"status":"bad", "message":"Asegurese de que el nombre del archivo no contenga puntos"})
 
-        validar = exerciseSchema.load(content)
-
-        retorno = actualizar_ejercicios.actualizar(content, id)
+        retorno = actualizar_ejercicios.actualizar(nombre, descripcion,tipo, id, filename)
 
         if isinstance(retorno, str):
             return jsonify({"status": "bad", "message": "Nombre ya se encuentra registrado"}), 406
 
         if retorno:
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             return jsonify({"status": "ok"}), 200
         else:
             return jsonify({"status": "bad"}), 400
@@ -211,7 +232,7 @@ def asignarRutina(id, idRutina):
         return jsonify({"status": "bad", "message": "no existe el usuario"}), 400
 
 
-@app.route('/admin')
+"""@app.route('/admin')
 def admin():
     return render_template('admin.html')
 
@@ -219,26 +240,37 @@ def admin():
 def uploader():
     try:
         if request.method == 'POST':
+
+            nombre = request.form['nombre']
+            descripcion = request.form['descripcion']
+            tipo = request.form['tipo']
+            print(nombre,descripcion,tipo)
             
-            f = request.files['archivo']
+            f = request.files['imagen']
 
             m = f.filename.split('.')
-            print (m)
 
-            dia = datetime.now()
-            salt = bcrypt.gensalt()
-            hash = bcrypt.hashpw(bytes(str(dia), encoding='utf-8'), salt)
-            h = str(hash).split('/')
-            if len(h) > 2:
-                t = h[1]+h[2]
+            if m[1]=="jpeg" or m[1]=="png" or m[1]=="jpg":
+
+                print (m)
+
+                dia = datetime.now()
+                salt = bcrypt.gensalt()
+                hash = bcrypt.hashpw(bytes(str(dia), encoding='utf-8'), salt)
+                h = str(hash).split('/')
+                if len(h) > 2:
+                    t = h[1]+h[2]
+                else:
+                    t = h[0]
+                print(h,"----------------")
+                filename = str(t)+"."+m[1]
+                
+                f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+                return "Archivo subido exitosamente"
             else:
-                t = h[0]
-            print(h,"----------------")
-            filename = str(t)+"."+m[1]
-            
-            f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
-            return "Archivo subido exitosamente"
+                print ("Por favor asegurese de que el nombre del archivo no incluya puntos")
+                return "Por favor asegurese de que el nombre del archivo no incluya puntos"
     except Exception as error:
         print(error)
-        return jsonify({"status": "error"}), 500
+        return jsonify({"status": "error"}), 500"""
