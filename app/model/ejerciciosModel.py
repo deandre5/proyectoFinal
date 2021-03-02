@@ -61,7 +61,6 @@ class Ejercicios:
 
             cursor = conexion.cursor()
 
-            imagen = ('https://proyectofinalsena.herokuapp.com/static/'+imagen)
             sql = "INSERT INTO ejercicios VALUES(%s, %s, %s, %s, %s)"
             datos = (id, nombre, descripcion, imagen, tipo)
 
@@ -124,7 +123,7 @@ class Ejercicios:
             id = (id)
             nombre = (nombre)
             descripcion = (descripcion)
-            imagen = ('https://proyectofinalsena.herokuapp.com/static/'+imagen)
+            imagen = (imagen)
             tipo = (tipo)
 
             cursor.execute(sql, (nombre, descripcion, imagen, tipo, id))

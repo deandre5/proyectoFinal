@@ -4,7 +4,9 @@ from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
 from datetime import datetime, date, time
 from werkzeug.utils import secure_filename
-import cloudinary as Cloud
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 from app.controllers.consultaEjercicios import consulta
 
@@ -32,11 +34,12 @@ asignar_rutina = Asignar()
 
 app = Flask(__name__)
 
-Cloud.config.update = ({
-    'cloud.name': os.environ.get('hdjsownnk'),
-    'api_key': os.environ.get('926599253344788'),
-    'api_secret': os.environ.get('I8rBOy-rnozmrxhNL_Lg7hqtj7s')
-})
+cloudinary.config  (
+  cloud_name = 'hdjsownnk',
+  api_key = '926599253344788',
+  api_secret = 'I8rBOy-rnozmrxhNL_Lg7hqtj7s'
+)
+
 app.config['UPLOAD_FOLDER'] = "../static"
 CORS(app)
 
@@ -87,37 +90,27 @@ def agregarEjercicios():
         nombre = request.form['nombre']
         descripcion = request.form['descripcion']
         tipo = request.form['tipo']
-        print(nombre,descripcion,tipo)
 
         f = request.files['imagen']
-        m = f.filename.split('.')
 
-        if m[1]=="jpeg" or m[1]=="png" or m[1]=="jpg":
-
-            
-
-            dia = datetime.now()
-            salt = bcrypt.gensalt()
-            hash = bcrypt.hashpw(bytes(str(dia), encoding='utf-8'), salt)
-            h = str(hash).split('/')
-            if len(h) > 2:
+        dia = datetime.now()
+        salt = bcrypt.gensalt()
+        hash = bcrypt.hashpw(bytes(str(dia), encoding='utf-8'), salt)
+        h = str(hash).split('/')
+        if len(h) > 2:
                 t = h[1]+h[2]
-            else:
-                t = h[0]
-                
-            filename = str(t)+"."+m[1]
-                
-            
         else:
-            return jsonify({"status":"bad", "message":"Asegurese de que el nombre del archivo no contenga puntos"})
+            t = h[0]
+                
+        filename = str(t)
 
+        cloudinary.uploader.upload(f, public_id= filename)
+        url = cloudinary.utils.cloudinary_url(filename)
 
-        
-
-        retorno = agregar_ejercicios.agregarEjercicios(nombre, descripcion, tipo, filename)
+        retorno = agregar_ejercicios.agregarEjercicios(nombre, descripcion, tipo, url[0])
 
         if retorno:
-            Cloud.uploader.upload(f, public_id= filename)
+            
             #f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             return jsonify({'status': 'ok'}), 200
         else:
@@ -142,31 +135,27 @@ def actualizarEjercicio(id):
         nombre = request.form['nombre']
         descripcion = request.form['descripcion']
         tipo = request.form['tipo']
-        print(nombre,descripcion,tipo)
 
         f = request.files['imagen']
-        m = f.filename.split('.')
 
-        if m[1]=="jpeg" or m[1]=="png" or m[1]=="jpg":
-
-            
-
-            dia = datetime.now()
-            salt = bcrypt.gensalt()
-            hash = bcrypt.hashpw(bytes(str(dia), encoding='utf-8'), salt)
-            h = str(hash).split('/')
-            if len(h) > 2:
+        dia = datetime.now()
+        salt = bcrypt.gensalt()
+        hash = bcrypt.hashpw(bytes(str(dia), encoding='utf-8'), salt)
+        h = str(hash).split('/')
+        if len(h) > 2:
                 t = h[1]+h[2]
-            else:
-                t = h[0]
+        else:
+            t = h[0]
                 
-            filename = str(t)+"."+m[1]
+        filename = str(t)
+
+        cloudinary.uploader.upload(f, public_id= filename)
+        url = cloudinary.utils.cloudinary_url(filename)
                 
             
-        else:
-            return jsonify({"status":"bad", "message":"Asegurese de que el nombre del archivo no contenga puntos"})
+        
 
-        retorno = actualizar_ejercicios.actualizar(nombre, descripcion,tipo, id, filename)
+        retorno = actualizar_ejercicios.actualizar(nombre, descripcion, tipo, id, url[0])
 
         if isinstance(retorno, str):
             return jsonify({"status": "bad", "message": "Nombre ya se encuentra registrado"}), 406
