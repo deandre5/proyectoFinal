@@ -4,6 +4,7 @@ from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
 from datetime import datetime, date, time
 from werkzeug.utils import secure_filename
+import cloudinary as Cloud
 
 from app.controllers.consultaEjercicios import consulta
 
@@ -30,6 +31,12 @@ agregar_rutinas = AgregarRutina()
 asignar_rutina = Asignar()
 
 app = Flask(__name__)
+
+Cloud.config.update = ({
+    'cloud.name': os.environ.get('hdjsownnk'),
+    'api_key': os.environ.get('926599253344788'),
+    'api_secret': os.environ.get('I8rBOy-rnozmrxhNL_Lg7hqtj7s')
+})
 app.config['UPLOAD_FOLDER'] = "../static"
 CORS(app)
 
@@ -110,7 +117,8 @@ def agregarEjercicios():
         retorno = agregar_ejercicios.agregarEjercicios(nombre, descripcion, tipo, filename)
 
         if retorno:
-            f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            Cloud.uploader.upload(f, public_id= filename)
+            #f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             return jsonify({'status': 'ok'}), 200
         else:
             print("********************************")
