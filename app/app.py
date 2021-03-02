@@ -30,7 +30,7 @@ agregar_rutinas = AgregarRutina()
 asignar_rutina = Asignar()
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = "https://proyectofinalsena.herokuapp.com/app/static"
+app.config['UPLOAD_FOLDER'] = "../app/static"
 CORS(app)
 
 app.secret_key = 'esto-es-una-clave-muy-secreta'
