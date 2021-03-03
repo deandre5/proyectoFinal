@@ -158,6 +158,7 @@ def actualizarEjercicio(id):
         retorno = actualizar_ejercicios.actualizar(nombre, descripcion, tipo, id, url[0])
 
         if isinstance(retorno, str):
+            
             return jsonify({"status": "bad", "message": "Nombre ya se encuentra registrado"}), 406
 
         if retorno:
@@ -166,6 +167,7 @@ def actualizarEjercicio(id):
             return jsonify({"status": "bad"}), 400
     except Exception as error:
         tojson = str(error)
+        print(error)
         return jsonify({"status": "bad", "message": tojson}), 406
 
 

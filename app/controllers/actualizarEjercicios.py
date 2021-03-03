@@ -16,7 +16,7 @@ class ActualizarEjercicios:
 
             verificarId = ejercicios.ConsultaId(id)
 
-            verificarNombre = ejercicios.consultarEjercicio(nombre)
+            verificarNombre = ejercicios.consultarEjercicioActualizar(nombre)
 
             if verificarNombre:
                 status = "mal"
