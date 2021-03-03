@@ -5,8 +5,6 @@ rutinas = Rutinas()
 class eliminar:
 
     def eliminarRutina( id):
-        print(id,"------------------------")
-
         
         consulta = rutinas.consultarId(id)
 

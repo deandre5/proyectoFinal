@@ -140,24 +140,31 @@ def actualizarEjercicio(id):
 
         f = request.files['imagen']
 
-        dia = datetime.now()
-        salt = bcrypt.gensalt()
-        hash = bcrypt.hashpw(bytes(str(dia), encoding='utf-8'), salt)
-        h = str(hash).split('/')
-        if len(h) > 2:
-                t = h[1]+h[2]
-        else:
-            t = h[0]
-                
-        filename = str(t)
+        if f:
 
-        cloudinary.uploader.upload(f, public_id= filename)
-        url = cloudinary.utils.cloudinary_url(filename)
+            dia = datetime.now()
+            salt = bcrypt.gensalt()
+            hash = bcrypt.hashpw(bytes(str(dia), encoding='utf-8'), salt)
+            h = str(hash).split('/')
+            if len(h) > 2:
+                    t = h[1]+h[2]
+            else:
+                t = h[0]
+                    
+            filename = str(t)
+
+            cloudinary.uploader.upload(f, public_id= filename)
+            url = cloudinary.utils.cloudinary_url(filename)
+            retorno = actualizar_ejercicios.actualizar(nombre, descripcion, tipo, id, url[0])
+        
+        else:
+            f= request.form['imagen']
+            retorno = actualizar_ejercicios.actualizar(nombre, descripcion, tipo, id, f)
                 
             
         
 
-        retorno = actualizar_ejercicios.actualizar(nombre, descripcion, tipo, id, url[0])
+        
 
         if isinstance(retorno, str):
             
