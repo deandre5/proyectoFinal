@@ -178,6 +178,11 @@ class Ejercicios:
 
             cursor = conexion.cursor()
 
+            sql = "DELETE FROM rutinasejercicio WHERE idejercicio = %s"
+
+            cursor.execute(sql, (id,))
+            conexion.commit()
+
             sql = "DELETE FROM ejercicios WHERE id = %s"
 
             cursor.execute(sql, (id,))

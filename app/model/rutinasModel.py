@@ -235,3 +235,24 @@ class Rutinas:
             cursor.close()
             conexion.close()
             return status
+
+    def remover(self, id):
+        try:
+            conexion = psycopg2.connect(database="dd1o1liu6nsqob", user="gvjdpzhyjsvfxs", password="5ffbbd36b7bf7d3ff6e7edb572b8667da3b15d4396b445f4e705f13c25f8d075",
+                                        host="ec2-52-23-190-126.compute-1.amazonaws.com", port="5432")
+
+            cursor = conexion.cursor()
+
+            sql = "DELETE FROM rutinas WHERE id= %s"
+
+            cursor.execute(sql, (id,))
+
+            conexion.commit()
+            
+        except Exception as error:
+            print("Error in the connection with the database", error)
+        
+        finally:
+            cursor.close()
+            conexion.close()
+

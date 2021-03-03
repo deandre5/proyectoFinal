@@ -16,6 +16,7 @@ from app.controllers.eliminarEjercicio import Eliminar
 
 from app.controllers.registrarRutinas import AgregarRutina
 from app.controllers.asignarRutina import Asignar
+from app.controllers.eliminarRutina import eliminar
 
 from app.validators.agregarEjerciciosV import CreateExerciseSchema
 from app.validators.rutinasValidate import CreateRoutineSchema
@@ -31,6 +32,7 @@ actualizar_ejercicios = ActualizarEjercicios()
 
 agregar_rutinas = AgregarRutina()
 asignar_rutina = Asignar()
+eliminar_rutina = eliminar()
 
 app = Flask(__name__)
 
@@ -228,6 +230,18 @@ def asignarRutina(id, idRutina):
 
     else:
         return jsonify({"status": "bad", "message": "no existe el usuario"}), 400
+
+
+
+@app.route('/eliminarRutina/<int:id>', methods=['DELETE'])
+def eliminarRutina(id):
+    id = str(id)
+    retorno = eliminar.eliminarRutina(id)
+
+    if retorno:
+        return jsonify({"status": "ok"}),200
+    else:
+        return jsonify({"status": "bad", "message": "no existe la rutina a eliminar"}), 400
 
 
 @app.route('/admin')
