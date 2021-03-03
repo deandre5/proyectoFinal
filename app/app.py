@@ -138,9 +138,16 @@ def actualizarEjercicio(id):
         descripcion = request.form['descripcion']
         tipo = request.form['tipo']
 
-        f = request.files['imagen']
+        if request.form['imagen']:
+            f= request.form['imagen']
+            retorno = actualizar_ejercicios.actualizar(nombre, descripcion, tipo, id, f)
+        
+        else:
 
-        if f:
+
+            f = request.files['imagen']
+
+        
 
             dia = datetime.now()
             salt = bcrypt.gensalt()
@@ -156,13 +163,6 @@ def actualizarEjercicio(id):
             cloudinary.uploader.upload(f, public_id= filename)
             url = cloudinary.utils.cloudinary_url(filename)
             retorno = actualizar_ejercicios.actualizar(nombre, descripcion, tipo, id, url[0])
-        
-        else:
-            f= request.form['imagen']
-            retorno = actualizar_ejercicios.actualizar(nombre, descripcion, tipo, id, f)
-                
-            
-        
 
         
 
