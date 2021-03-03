@@ -159,12 +159,12 @@ def actualizarEjercicio(id):
             url = cloudinary.utils.cloudinary_url(filename)
             retorno = actualizar_ejercicios.actualizar(nombre, descripcion, tipo, id, url[0])
 
-        elif request.form['url']:
+
+        if request.form['url']:
             f= request.form['url']
             retorno = actualizar_ejercicios.actualizar(nombre, descripcion, tipo, id, f)
 
 
-            
 
         
 
