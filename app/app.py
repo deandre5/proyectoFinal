@@ -161,7 +161,6 @@ def actualizarEjercicio(id):
             return jsonify({"status": "bad", "message": "Nombre ya se encuentra registrado"}), 406
 
         if retorno:
-            f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             return jsonify({"status": "ok"}), 200
         else:
             return jsonify({"status": "bad"}), 400
