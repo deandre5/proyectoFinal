@@ -138,12 +138,7 @@ def actualizarEjercicio(id):
         descripcion = request.form['descripcion']
         tipo = request.form['tipo']
 
-        if request.form['url']:
-            f= request.form['url']
-            retorno = actualizar_ejercicios.actualizar(nombre, descripcion, tipo, id, f)
-        
-        elif request.files['imagen']:
-
+        if request.form['imagen']:
 
             f = request.files['imagen']
 
@@ -163,6 +158,13 @@ def actualizarEjercicio(id):
             cloudinary.uploader.upload(f, public_id= filename)
             url = cloudinary.utils.cloudinary_url(filename)
             retorno = actualizar_ejercicios.actualizar(nombre, descripcion, tipo, id, url[0])
+            
+        elif request.files['url']:
+            f= request.form['url']
+            retorno = actualizar_ejercicios.actualizar(nombre, descripcion, tipo, id, f)
+
+
+            
 
         
 
