@@ -138,8 +138,8 @@ def actualizarEjercicio(id):
         descripcion = request.form['descripcion']
         tipo = request.form['tipo']
 
-        if request.form['imagen']:
-            f= request.form['imagen']
+        if request.form['url']:
+            f= request.form['url']
             retorno = actualizar_ejercicios.actualizar(nombre, descripcion, tipo, id, f)
         
         if request.files['imagen']:
