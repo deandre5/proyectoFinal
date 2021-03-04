@@ -87,13 +87,18 @@ def agregarEjercicios():
     try:       
 
         #validar = exerciseSchema.load(content)
+        
+        validar = exerciseSchema.validate(request.form)
 
 
         nombre = request.form['nombre']
         descripcion = request.form['descripcion']
         tipo = request.form['tipo']
+        
 
         f = request.files['imagen']
+
+        filename = secure_filename(f.filename)
 
         dia = datetime.now()
         salt = bcrypt.gensalt()
@@ -113,7 +118,6 @@ def agregarEjercicios():
 
         if retorno:
             
-            #f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             return jsonify({'status': 'ok'}), 200
         else:
             print("********************************")
@@ -134,6 +138,8 @@ def actualizarEjercicio(id):
     try:
         id = str(id)
 
+        validar = exerciseSchema.validate(request.form)
+
         nombre = request.form['nombre']
         descripcion = request.form['descripcion']
         tipo = request.form['tipo']
@@ -141,6 +147,8 @@ def actualizarEjercicio(id):
         if len(request.files) > 0:
 
             f = request.files['imagen']
+            filename = secure_filename(f.filename)
+
 
         
 
