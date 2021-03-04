@@ -9,6 +9,7 @@ class consulta:
     # metodo encargado de realizar la consulta general de los ejercicios
     def consultar(self):
 
+        # variable tipo lista que devuelve los datos obtenidos de la base de datos
         diccionario = ejercicios.consultar()
         return diccionario
 

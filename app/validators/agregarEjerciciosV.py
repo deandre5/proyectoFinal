@@ -16,8 +16,8 @@ class CreateExerciseSchema(Schema):
     descripcion = fields.String(required=True, validate=validate.Length(
         min=1, max=258), data_key='descripcion')
 
-    #imagen = fields.String(required=True, validate=validate.Length(
-        #min=1, max=258), data_key='imagen')
+    # imagen = fields.String(required=True, validate=validate.Length(
+    # min=1, max=258), data_key='imagen')
 
     tipo = fields.String(required=True, validate=validate.Length(
         min=1, max=45), data_key='tipo')
