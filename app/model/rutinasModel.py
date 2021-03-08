@@ -227,7 +227,7 @@ class Rutinas:
 
             cursor = conexion.cursor()
 
-            sql = "UPDATE usuarios SET id_rutina = %s WHERE id = %s"
+            sql = "UPDATE personas SET idrutina = %s WHERE documento = %s"
 
             id = (id)
             id_rutina = (id_rutina)
@@ -252,7 +252,7 @@ class Rutinas:
                                         host="ec2-52-23-190-126.compute-1.amazonaws.com", port="5432")
 
             cursor = conexion.cursor()
-            sql = "SELECT * FROM usuarios WHERE id = %s"
+            sql = "SELECT * FROM personas WHERE documento = %s"
 
             cursor.execute(sql, (id,))
             diccionario = cursor.fetchall()
