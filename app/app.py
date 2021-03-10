@@ -64,7 +64,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 @app.route('/admin')
 def index():
     encode_jwt = jwt.encode({'exp': datetime.datetime.utcnow(
-    ) + datetime.timedelta(seconds=300), "user": "admin"}, KEY_TOKEN_AUTH, algorithm='HS256')
+    ) + datetime.timedelta(seconds=1500), "user": "admin"}, KEY_TOKEN_AUTH, algorithm='HS256')
 
     print(encode_jwt)
 
@@ -75,7 +75,7 @@ def index():
 @app.route('/user')
 def user():
     encode_jwt = jwt.encode({'exp': datetime.datetime.utcnow(
-    ) + datetime.timedelta(seconds=300), "user": "user"}, KEY_TOKEN_AUTH, algorithm='HS256')
+    ) + datetime.timedelta(seconds=1500), "user": "user"}, KEY_TOKEN_AUTH, algorithm='HS256')
 
     print(encode_jwt)
 
@@ -438,8 +438,9 @@ def actualizarRutina(id):
 
 
 # funcion que recibe el id del usuario y un id de rutina para realizar su asignacion
-@app.route('/asignarRutina/<int:id>/<int:idRutina>', methods=['POST'])
+@app.route('/asignarRutina/<int:id>/<int:idRutina>', methods=['PUT'])
 def asignarRutina(id, idRutina):
+
 
     if (request.headers.get('Authorization')):
         validar = request.headers.get('Authorization')
