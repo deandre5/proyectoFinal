@@ -222,7 +222,7 @@ def agregarEjercicios():
                                 return jsonify({'status': 'error', "message": "Error"}), 400
                     
                     else:
-                        return jsonify({'status': 'error', "message": "Ingrese un archivo compatible"})
+                        return jsonify({'status': 'error', "message": "Ingrese un archivo compatible"}),400
 
                 except Exception as error:
                     tojson = str(error)
