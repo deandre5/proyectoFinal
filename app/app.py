@@ -22,6 +22,7 @@ from app.controllers.registrarRutinas import AgregarRutina
 from app.controllers.asignarRutina import Asignar
 from app.controllers.eliminarRutina import eliminar
 from app.controllers.consultarRutinas import consultarRutinas
+from app.controllers.actualizarRutina import ActualizarRutina
 
 from app.validators.agregarEjerciciosV import CreateExerciseSchema
 from app.validators.rutinasValidate import CreateRoutineSchema
@@ -39,6 +40,7 @@ agregar_rutinas = AgregarRutina()
 asignar_rutina = Asignar()
 eliminar_rutina = eliminar()
 consultar_rutinas = consultarRutinas()
+actualizar_rutina = ActualizarRutina()
 
 app = Flask(__name__)
 
@@ -54,13 +56,15 @@ CORS(app)
 
 app.secret_key = 'esto-es-una-clave-muy-secreta'
 
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
 # funcion que crea un token, teniendo un admin como usuario
 
 
 @app.route('/admin')
 def index():
     encode_jwt = jwt.encode({'exp': datetime.datetime.utcnow(
-    ) + datetime.timedelta(seconds=180), "user": "admin"}, KEY_TOKEN_AUTH, algorithm='HS256')
+    ) + datetime.timedelta(seconds=300), "user": "admin"}, KEY_TOKEN_AUTH, algorithm='HS256')
 
     print(encode_jwt)
 
@@ -71,7 +75,7 @@ def index():
 @app.route('/user')
 def user():
     encode_jwt = jwt.encode({'exp': datetime.datetime.utcnow(
-    ) + datetime.timedelta(seconds=180), "user": "user"}, KEY_TOKEN_AUTH, algorithm='HS256')
+    ) + datetime.timedelta(seconds=300), "user": "user"}, KEY_TOKEN_AUTH, algorithm='HS256')
 
     print(encode_jwt)
 
@@ -144,10 +148,14 @@ def consultaEjercicios():
                 return jsonify({'status': 'error'}), 400
 
         else:
-            return jsonify({'status': 'error', "message": "Token invalido"})
+            return jsonify({'status': 'error', "message": "Token invalido"}),400
     else:
-        return jsonify({'status': 'No ha envido ningun token'})
+        return jsonify({'status': 'No ha envido ningun token'}),400
 
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # metodo que recibe mediante post un json, luego valida y envia a la bd para registrar un ejercicio
 @app.route('/agregarEjercicios', methods=['POST'])
@@ -168,46 +176,53 @@ def agregarEjercicios():
                     descripcion = request.form['descripcion']
                     tipo = request.form['tipo']
 
+                    
+
                     # variable que obtiene como valor la imagen enviada desde el cliente
                     f = request.files['imagen']
 
-                    # se encarga de revizar que el nombre del archivo no sea un problema para nuestro programa
-                    filename = secure_filename(f.filename)
+                    if allowed_file(f.filename):
 
-                    # se encripta el dia actual, la hora y se genera un salt, luego el salt se divide en partes mediante el /
-                    dia = datetime.datetime.utcnow()
-                    salt = bcrypt.gensalt()
-                    hash = bcrypt.hashpw(
-                        bytes(str(dia), encoding='utf-8'), salt)
-                    h = str(hash).split('/')
+                        # se encarga de revizar que el nombre del archivo no sea un problema para nuestro programa
+                        filename = secure_filename(f.filename)
 
-                    # se reviza el len de h para poder determinar su nombe proviniente del hash
-                    if len(h) > 2:
-                        t = h[1]+h[2]
-                    else:
-                        t = h[0]
+                        # se encripta el dia actual, la hora y se genera un salt, luego el salt se divide en partes mediante el /
+                        dia = datetime.datetime.utcnow()
+                        salt = bcrypt.gensalt()
+                        hash = bcrypt.hashpw(
+                            bytes(str(dia), encoding='utf-8'), salt)
+                        h = str(hash).split('/')
 
-                    filename = str(t)
-
-                    # se llama a la api y se registra la imagen y el nombre al cual le hicimos hash, luego obtenemos la url para enviarla al controller
-                    cloudinary.uploader.upload(f, public_id=filename)
-                    url = cloudinary.utils.cloudinary_url(filename)
-
-                    # se envian los datos al controller para su registro
-                    retorno = agregar_ejercicios.agregarEjercicios(
-                        nombre, descripcion, tipo, url[0])
-
-                    # se examina si se registro la informacion en la base de datos
-                    if retorno:
-
-                        return jsonify({'status': 'ok'}), 200
-                    else:
-                        # se examina si el nombre esta repetido en la base de datos
-                        status = agregar_ejercicios.consultar(nombre)
-                        if status:
-                            return jsonify({'status': "bad", "message": "ya se encuentra registrada"}), 400
+                        # se reviza el len de h para poder determinar su nombe proviniente del hash
+                        if len(h) > 2:
+                            t = h[1]+h[2]
                         else:
-                            return jsonify({'status': 'error', "message": "Error"}), 400
+                            t = h[0]
+
+                        filename = str(t)
+
+                        # se llama a la api y se registra la imagen y el nombre al cual le hicimos hash, luego obtenemos la url para enviarla al controller
+                        cloudinary.uploader.upload(f, public_id=filename)
+                        url = cloudinary.utils.cloudinary_url(filename)
+
+                        # se envian los datos al controller para su registro
+                        retorno = agregar_ejercicios.agregarEjercicios(
+                            nombre, descripcion, tipo, url[0])
+
+                        # se examina si se registro la informacion en la base de datos
+                        if retorno:
+
+                            return jsonify({'status': 'ok'}), 200
+                        else:
+                            # se examina si el nombre esta repetido en la base de datos
+                            status = agregar_ejercicios.consultar(nombre)
+                            if status:
+                                return jsonify({'status': "bad", "message": "ya se encuentra registrada"}), 400
+                            else:
+                                return jsonify({'status': 'error', "message": "Error"}), 400
+                    
+                    else:
+                        return jsonify({'status': 'error', "message": "Ingrese un archivo compatible"})
 
                 except Exception as error:
                     tojson = str(error)
@@ -321,11 +336,11 @@ def eliminarEjercicios(id):
                 else:
                     return jsonify({"status": "bad", "message": "No existe el ejercicio"}), 400
             else:
-                return jsonify({'status': 'bad', "message": "No tiene permisos para acceder"})
+                return jsonify({'status': 'bad', "message": "No tiene permisos para acceder"}),400
         else:
-            return jsonify({'status': 'error', "message": "Token invalido"})
+            return jsonify({'status': 'error', "message": "Token invalido"}),400
     else:
-        return jsonify({'status': 'No ha envido ningun token'})
+        return jsonify({'status': 'No ha envido ningun token'}),400
 
 
 # funcion que se encarga de recibir el json para el registro de las rutinas
@@ -342,7 +357,7 @@ def registrarRutinas():
                     # se recibe el json y se validan los campos de este
                     content = request.get_json()
 
-                    validar = rutinasSchema.load(content)
+                    validarRutina = rutinasSchema.load(content)
 
                     # se envia el json para su registro
                     retorno = agregar_rutinas.agregar(content)
@@ -369,6 +384,49 @@ def registrarRutinas():
                     return jsonify({"status": "no es posible validar", "error": tojson}), 406
             else:
                 return jsonify({"status": "bad", "message": "No tiene permisos para acceder"})
+        else:
+            return jsonify({'status': 'error', "message": "Token invalido"})
+    else:
+        return jsonify({'status': 'No ha envido ningun token'})
+
+#funcion que recibe un id para actualizar una rutina
+@app.route('/actualizarRutina/<int:id>', methods=['PUT'])
+def actualizarRutina(id):
+
+    if request.headers.get('Authorization'):
+        validar = request.headers.get('Authorization')
+
+        validate = validacion(validar)
+
+        if validate:
+            if validate.get('user') == "admin":
+                
+                id = str(id)
+
+                content = request.get_json()
+
+                validarRutina = rutinasSchema.load(content)
+
+                retorno = actualizar_rutina.actualizarRutina(content, id)
+
+                if isinstance(retorno, str):
+                    return jsonify({"status": "bad", "message": "No existe el ejercicio a registrar"}), 406
+
+                if retorno:
+                        return jsonify({'status': 'ok'}), 200
+
+                else:
+                        # se valida si el nombre de la rutina ya existe en la base de datos
+                    status = agregar_rutinas.consulta(content)
+
+                    if status:
+                        return jsonify({'status': "bad", "message": "ya se encuentra registrada"}), 400
+                    else:
+                        return jsonify({'status': 'error', "message": "Error"}), 400
+
+            
+            else:
+                return jsonify({"status": "bad", "message": "no tiene permisos para acceder"}), 400
         else:
             return jsonify({'status': 'error', "message": "Token invalido"})
     else:
@@ -455,3 +513,6 @@ def consultarRutinas():
             return jsonify({'status': 'error', "message": "Token invalido"})
     else:
         return jsonify({'status': 'No ha envido ningun token'})
+
+
+
