@@ -260,32 +260,36 @@ def actualizarEjercicio(id):
                     if len(request.files) > 0:
                         # variable que obtiene como valor la imagen enviada desde el cliente
                         f = request.files['imagen']
+                        if allowed_file(f.filename):
 
                         # se encarga de revizar que el nombre del archivo no sea un problema para nuestro programa
 
-                        filename = secure_filename(f.filename)
+                            filename = secure_filename(f.filename)
 
-                        # se encripta el dia actual, la hora y se genera un salt, luego el salt se divide en partes mediante el /
-                        dia = datetime.datetime.utcnow()
-                        salt = bcrypt.gensalt()
-                        hash = bcrypt.hashpw(
-                            bytes(str(dia), encoding='utf-8'), salt)
-                        h = str(hash).split('/')
+                            # se encripta el dia actual, la hora y se genera un salt, luego el salt se divide en partes mediante el /
+                            dia = datetime.datetime.utcnow()
+                            salt = bcrypt.gensalt()
+                            hash = bcrypt.hashpw(
+                                bytes(str(dia), encoding='utf-8'), salt)
+                            h = str(hash).split('/')
 
-                        # se reviza el len de h para poder determinar su nombe proviniente del hash
-                        if len(h) > 2:
-                            t = h[1]+h[2]
+                            # se reviza el len de h para poder determinar su nombe proviniente del hash
+                            if len(h) > 2:
+                                t = h[1]+h[2]
+                            else:
+                                t = h[0]
+
+                            filename = str(t)
+                            # se llama a la api y se registra la imagen y el nombre al cual le hicimos hash, luego obtenemos la url para enviarla al controller
+                            cloudinary.uploader.upload(f, public_id=filename)
+                            url = cloudinary.utils.cloudinary_url(filename)
+
+                            # se envian los datos al controller para su registro
+                            retorno = actualizar_ejercicios.actualizar(
+                                nombre, descripcion, tipo, id, url[0])
                         else:
-                            t = h[0]
+                            return jsonify({'status': 'error', "message": "Ingrese un archivo compatible"}),400
 
-                        filename = str(t)
-                        # se llama a la api y se registra la imagen y el nombre al cual le hicimos hash, luego obtenemos la url para enviarla al controller
-                        cloudinary.uploader.upload(f, public_id=filename)
-                        url = cloudinary.utils.cloudinary_url(filename)
-
-                        # se envian los datos al controller para su registro
-                        retorno = actualizar_ejercicios.actualizar(
-                            nombre, descripcion, tipo, id, url[0])
 
                     else:
                         # si no se envian imagenes, se recupera al anterior url y se envia al controller para su registro
