@@ -148,9 +148,9 @@ def consultaEjercicios():
                 return jsonify({'status': 'error'}), 400
 
         else:
-            return jsonify({'status': 'error', "message": "Token invalido"}),400
+            return jsonify({'status': 'error', "message": "Token invalido"}), 400
     else:
-        return jsonify({'status': 'No ha envido ningun token'}),400
+        return jsonify({'status': 'No ha envido ningun token'}), 400
 
 
 def allowed_file(filename):
@@ -158,6 +158,8 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # metodo que recibe mediante post un json, luego valida y envia a la bd para registrar un ejercicio
+
+
 @app.route('/agregarEjercicios', methods=['POST'])
 def agregarEjercicios():
     if (request.headers.get('Authorization')):
@@ -175,8 +177,6 @@ def agregarEjercicios():
                     nombre = request.form['nombre']
                     descripcion = request.form['descripcion']
                     tipo = request.form['tipo']
-
-                    
 
                     # variable que obtiene como valor la imagen enviada desde el cliente
                     f = request.files['imagen']
@@ -220,9 +220,9 @@ def agregarEjercicios():
                                 return jsonify({'status': "bad", "message": "ya se encuentra registrada"}), 400
                             else:
                                 return jsonify({'status': 'error', "message": "Error"}), 400
-                    
+
                     else:
-                        return jsonify({'status': 'error', "message": "Ingrese un archivo compatible"}),400
+                        return jsonify({'status': 'error', "message": "Ingrese un archivo compatible"}), 400
 
                 except Exception as error:
                     tojson = str(error)
@@ -262,7 +262,7 @@ def actualizarEjercicio(id):
                         f = request.files['imagen']
                         if allowed_file(f.filename):
 
-                        # se encarga de revizar que el nombre del archivo no sea un problema para nuestro programa
+                            # se encarga de revizar que el nombre del archivo no sea un problema para nuestro programa
 
                             filename = secure_filename(f.filename)
 
@@ -288,8 +288,7 @@ def actualizarEjercicio(id):
                             retorno = actualizar_ejercicios.actualizar(
                                 nombre, descripcion, tipo, id, url[0])
                         else:
-                            return jsonify({'status': 'error', "message": "Ingrese un archivo compatible"}),400
-
+                            return jsonify({'status': 'error', "message": "Ingrese un archivo compatible"}), 400
 
                     else:
                         # si no se envian imagenes, se recupera al anterior url y se envia al controller para su registro
@@ -340,11 +339,11 @@ def eliminarEjercicios(id):
                 else:
                     return jsonify({"status": "bad", "message": "No existe el ejercicio"}), 400
             else:
-                return jsonify({'status': 'bad', "message": "No tiene permisos para acceder"}),400
+                return jsonify({'status': 'bad', "message": "No tiene permisos para acceder"}), 400
         else:
-            return jsonify({'status': 'error', "message": "Token invalido"}),400
+            return jsonify({'status': 'error', "message": "Token invalido"}), 400
     else:
-        return jsonify({'status': 'No ha envido ningun token'}),400
+        return jsonify({'status': 'No ha envido ningun token'}), 400
 
 
 # funcion que se encarga de recibir el json para el registro de las rutinas
@@ -393,7 +392,9 @@ def registrarRutinas():
     else:
         return jsonify({'status': 'No ha envido ningun token'})
 
-#funcion que recibe un id para actualizar una rutina
+# funcion que recibe un id para actualizar una rutina
+
+
 @app.route('/actualizarRutina/<int:id>', methods=['PUT'])
 def actualizarRutina(id):
 
@@ -404,7 +405,7 @@ def actualizarRutina(id):
 
         if validate:
             if validate.get('user') == "admin":
-                
+
                 id = str(id)
 
                 content = request.get_json()
@@ -417,10 +418,10 @@ def actualizarRutina(id):
                     return jsonify({"status": "bad", "message": "No existe el ejercicio a registrar"}), 406
 
                 if retorno:
-                        return jsonify({'status': 'ok'}), 200
+                    return jsonify({'status': 'ok'}), 200
 
                 else:
-                        # se valida si el nombre de la rutina ya existe en la base de datos
+                    # se valida si el nombre de la rutina ya existe en la base de datos
                     status = agregar_rutinas.consulta(content)
 
                     if status:
@@ -428,7 +429,6 @@ def actualizarRutina(id):
                     else:
                         return jsonify({'status': 'error', "message": "Error"}), 400
 
-            
             else:
                 return jsonify({"status": "bad", "message": "no tiene permisos para acceder"}), 400
         else:
@@ -440,7 +440,6 @@ def actualizarRutina(id):
 # funcion que recibe el id del usuario y un id de rutina para realizar su asignacion
 @app.route('/asignarRutina/<int:id>/<int:idRutina>', methods=['PUT'])
 def asignarRutina(id, idRutina):
-
 
     if (request.headers.get('Authorization')):
         validar = request.headers.get('Authorization')
@@ -520,4 +519,27 @@ def consultarRutinas():
         return jsonify({'status': 'No ha envido ningun token'})
 
 
+
+@app.route('/consultarRutinas/<int:id>', methods=['GET'])
+def consultarRutinas():
+
+    if (request.headers.get('Authorization')):
+        validar = request.headers.get('Authorization')
+
+        validate = validacion(validar)
+
+        if validate:
+
+            id = str(id)
+
+            retorno = consultar_rutinas.consultar(id)
+
+            if retorno:
+                return jsonify({'status': 'ok', 'ejercicios': retorno}), 200
+            else:
+                return jsonify({'status': 'error'}), 400
+        else:
+            return jsonify({'status': 'error', "message": "Token invalido"}), 400
+    else:
+        return jsonify({'status': 'No ha envido ningun token'}),400
 

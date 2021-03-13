@@ -8,3 +8,8 @@ class consultarRutinas():
     def consultar(self):
         diccionario = rutinas.consultaGeneral()
         return diccionario
+
+
+    def consultaID(self, id):
+        diccionario = rutinas.consultarIDR(id)
+        return diccionario
