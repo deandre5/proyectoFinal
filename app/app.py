@@ -521,7 +521,7 @@ def consultarRutinas():
 
 
 @app.route('/consultarRutinas/<int:id>', methods=['GET'])
-def consultarRutinas():
+def consultarRutinasID(id):
 
     if (request.headers.get('Authorization')):
         validar = request.headers.get('Authorization')
@@ -532,7 +532,7 @@ def consultarRutinas():
 
             id = str(id)
 
-            retorno = consultar_rutinas.consultar(id)
+            retorno = consultar_rutinas.consultaID(id)
 
             if retorno:
                 return jsonify({'status': 'ok', 'ejercicios': retorno}), 200

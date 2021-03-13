@@ -28,8 +28,7 @@ class Rutinas:
             conexion.close()
             return status
 
-
-    def actualizar(self,  id, nombre, descripcion, intensidad, dificultad, categoria ):
+    def actualizar(self,  id, nombre, descripcion, intensidad, dificultad, categoria):
         try:
             conexion = psycopg2.connect(database="dd1o1liu6nsqob", user="gvjdpzhyjsvfxs", password="5ffbbd36b7bf7d3ff6e7edb572b8667da3b15d4396b445f4e705f13c25f8d075",
                                         host="ec2-52-23-190-126.compute-1.amazonaws.com", port="5432")
@@ -45,12 +44,11 @@ class Rutinas:
             dificultad = (dificultad)
             categoria = (categoria)
 
-            cursor.execute(sql, (nombre, descripcion, intensidad, dificultad, categoria, id, ))
+            cursor.execute(sql, (nombre, descripcion, intensidad,
+                           dificultad, categoria, id, ))
             conexion.commit()
 
             status = True
-
-
 
         except Exception as error:
             print("Error in the actualizar conection", error)
@@ -63,6 +61,8 @@ class Rutinas:
 
 
 # funcion encarga de consultar las rutinas dentro del sistema
+
+
     def consultar(self):
         try:
             conexion = psycopg2.connect(database="dd1o1liu6nsqob", user="gvjdpzhyjsvfxs", password="5ffbbd36b7bf7d3ff6e7edb572b8667da3b15d4396b445f4e705f13c25f8d075",
@@ -145,8 +145,7 @@ class Rutinas:
             return diccionarios
 
 
-
-def consultarIDR(self, id):
+    def consultarIDR(self, id):
         try:
             conexion = psycopg2.connect(database="dd1o1liu6nsqob", user="gvjdpzhyjsvfxs", password="5ffbbd36b7bf7d3ff6e7edb572b8667da3b15d4396b445f4e705f13c25f8d075",
                                         host="ec2-52-23-190-126.compute-1.amazonaws.com", port="5432")
@@ -186,10 +185,9 @@ def consultarIDR(self, id):
 
                 diccionarios.append(items)
 
-
             conexion.commit()
 
-            status = diccionario
+            status = diccionarios
 
         except Exception as error:
             print("Error in the conetion with the database", error)
