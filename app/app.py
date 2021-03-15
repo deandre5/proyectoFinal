@@ -560,7 +560,7 @@ def reporteRutinas():
             if validate.get('user') == "admin":
 
                 retorno = reporte_rutina.generarReporte()
-                return Response(retorno, mimetype="application/ms-excel", headers={"content-Disposition": "attachment; filename=reporteRutinas.xlsx"})
+                return Response(retorno, mimetype="application/ms-excel", headers={"content-Disposition": "attachment; filename=reporteRutinas.csv"})
 
             else:
                 return jsonify({"status": "bad", "message": "no tiene permisos para acceder"}), 400
