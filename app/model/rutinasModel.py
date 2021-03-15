@@ -442,5 +442,38 @@ class Rutinas:
             cursor.close()
             conexion.close()
 
+    def reporte(self):
+        try:
+            conexion = psycopg2.connect(database="dd1o1liu6nsqob", user="gvjdpzhyjsvfxs", password="5ffbbd36b7bf7d3ff6e7edb572b8667da3b15d4396b445f4e705f13c25f8d075",
+                                        host="ec2-52-23-190-126.compute-1.amazonaws.com", port="5432")
+
+            cursor = conexion.cursor()
+
+            sql = "SELECT r.nombre, count(*) FROM rutinas r, personas p WHERE r.id = p.idrutina GROUP BY r.nombre ORDER BY r.nombre ASC"
+
+            cursor.execute(sql,)
+            diccionario = cursor.fetchall()
+
+            diccionarios = []
+
+            for item in diccionario:
+                items = {"nombre": item[0], "cantidad": item[1]}
+
+                diccionarios.append(items)
+                
+            conexion.commit()
+
+            status = diccionarios
+        
+        except Exception as error:
+            print("Error in the conetion with the database", error)
+
+            status = False
+
+        finally:
+            cursor.close()
+            conexion.close()
+            return status
+
 
     

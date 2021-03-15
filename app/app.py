@@ -1,6 +1,6 @@
 import os
 import bcrypt
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template, Response
 from flask_cors import CORS
 import datetime
 from werkzeug.utils import secure_filename
@@ -9,6 +9,9 @@ import cloudinary.uploader
 import cloudinary.api
 import bcrypt
 import jwt
+import io
+import xlwt
+
 
 from app.config.config import KEY_TOKEN_AUTH
 
@@ -23,6 +26,7 @@ from app.controllers.asignarRutina import Asignar
 from app.controllers.eliminarRutina import eliminar
 from app.controllers.consultarRutinas import consultarRutinas
 from app.controllers.actualizarRutina import ActualizarRutina
+from app.controllers.ReporteRutina import ReporteRutina
 
 from app.validators.agregarEjerciciosV import CreateExerciseSchema
 from app.validators.rutinasValidate import CreateRoutineSchema
@@ -41,6 +45,7 @@ asignar_rutina = Asignar()
 eliminar_rutina = eliminar()
 consultar_rutinas = consultarRutinas()
 actualizar_rutina = ActualizarRutina()
+reporte_rutina = ReporteRutina()
 
 app = Flask(__name__)
 
@@ -542,4 +547,26 @@ def consultarRutinasID(id):
             return jsonify({'status': 'error', "message": "Token invalido"}), 400
     else:
         return jsonify({'status': 'No ha envido ningun token'}),400
+
+
+@app.route('/reporteRutinas', methods=['GET'])
+def reporteRutinas():
+    
+    if(request.headers.get('Authorization')):
+        validar = request.headers.get('Authorization')
+
+        validate = validacion(validar)
+
+        if validate:
+            if validate.get('user') == "admin":
+
+                retorno = reporte_rutina.generarReporte()
+                return Response(retorno, mimetype="application/ms-excel", headers={"content-Disposition": "attachment; filename=reporteRutinas.xls"})
+            
+            else:
+                return jsonify({"status": "bad", "message": "no tiene permisos para acceder"}), 400
+        else:
+            return jsonify({'status': 'error', "message": "Token invalido"})
+    else:
+        return jsonify({'status': 'No ha envido ningun token'})
 
