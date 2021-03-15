@@ -524,7 +524,6 @@ def consultarRutinas():
         return jsonify({'status': 'No ha envido ningun token'})
 
 
-
 @app.route('/consultarRutinas/<int:id>', methods=['GET'])
 def consultarRutinasID(id):
 
@@ -546,12 +545,12 @@ def consultarRutinasID(id):
         else:
             return jsonify({'status': 'error', "message": "Token invalido"}), 400
     else:
-        return jsonify({'status': 'No ha envido ningun token'}),400
+        return jsonify({'status': 'No ha envido ningun token'}), 400
 
 
 @app.route('/reporteRutinas', methods=['GET'])
 def reporteRutinas():
-    
+
     if(request.headers.get('Authorization')):
         validar = request.headers.get('Authorization')
 
@@ -561,12 +560,11 @@ def reporteRutinas():
             if validate.get('user') == "admin":
 
                 retorno = reporte_rutina.generarReporte()
-                return Response(retorno, mimetype="application/ms-excel", headers={"content-Disposition": "attachment; filename=reporteRutinas.xls"})
-            
+                return Response(retorno, mimetype="application/ms-excel", headers={"content-Disposition": "attachment; filename=reporteRutinas.xlsx"})
+
             else:
                 return jsonify({"status": "bad", "message": "no tiene permisos para acceder"}), 400
         else:
             return jsonify({'status': 'error', "message": "Token invalido"})
     else:
         return jsonify({'status': 'No ha envido ningun token'})
-
