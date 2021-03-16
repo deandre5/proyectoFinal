@@ -403,6 +403,8 @@ def registrarRutinas():
 @app.route('/actualizarRutina/<int:id>', methods=['PUT'])
 def actualizarRutina(id):
 
+    
+
     if request.headers.get('Authorization'):
         validar = request.headers.get('Authorization')
 
@@ -414,6 +416,7 @@ def actualizarRutina(id):
                 id = str(id)
 
                 content = request.get_json()
+                
 
                 validarRutina = rutinasSchema.load(content)
 

@@ -238,20 +238,24 @@ class Rutinas:
             return status
 
 
-    def ActualizacionEjercicios(self, id):
+    def ActualizacionEjercicios(self, id, ejercicios):
         try:
             conexion = psycopg2.connect(database="dd1o1liu6nsqob", user="gvjdpzhyjsvfxs", password="5ffbbd36b7bf7d3ff6e7edb572b8667da3b15d4396b445f4e705f13c25f8d075",
                                         host="ec2-52-23-190-126.compute-1.amazonaws.com", port="5432")
 
             cursor = conexion.cursor()
 
-            sql = "DELETE FROM rutinasejercicio WHERE  idrutinas = %s"
+            sql = "UPDATE rutinasejercicio SET repeticiones= %s, series=%s, ejecucion=%s, dia=%s  WHERE  idrutinas = %s and idejercicio=%s"
 
-           
-           
-            cursor.execute(sql, ( id, ))
-
-            conexion.commit()
+            for i in ejercicios:
+                repeticiones = i.get("repeticiones")
+                series = i.get("series")
+                dia = i.get("dia")
+                ejecucion = i.get("ejecucion")
+                id_ejercicio = i.get("id_ejercicio")
+                cursor.execute(sql, ( repeticiones, series, ejecucion, dia, id, id_ejercicio, ))
+                print("/--*-*-*-*-*-*-*-////",ejecucion)
+                conexion.commit()
 
             status = True
 
@@ -312,13 +316,17 @@ class Rutinas:
             # se verifica que el len de los ejercicios sea igual que el len de los ejercicios en la base de datos
 
             for i in ejercicios:
+                
+                
                 id_ejercicio = i.get("id_ejercicio")
+                print (id_ejercicio)
 
                 cursor.execute(sql, (id_ejercicio,))
                 diccionario = cursor.fetchall()
                 conexion.commit()
 
                 if len(diccionario) > 0:
+                    print("HAsta aqui funciona bien")
                     diccionarios.append(diccionario)
 
             if len(diccionarios) == len(ejercicios):

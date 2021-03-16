@@ -12,16 +12,19 @@ class ActualizarRutina():
             categoria = content.get('categoria')
             ejercicios = content.get('ejercicios')
 
+            print(ejercicios)
+
             consultaIDEjercicios = rutinas.consultaIdEjercicio(ejercicios)
 
             if consultaIDEjercicios:
+                
                 actualizar = rutinas.actualizar(id,nombre, descripcion, intensidad, dificultad, categoria)
+                
 
                 if actualizar:
 
-                    eliminar = rutinas.ActualizacionEjercicios(id)
+                    status = rutinas.ActualizacionEjercicios(id, ejercicios)
 
-                    status = rutinas.registroEjercicios(ejercicios, id)
 
                     return status
                 else:
