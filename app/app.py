@@ -30,6 +30,7 @@ from app.controllers.ReporteRutina import ReporteRutina
 
 from app.controllers.registroDietas import AgregarDietas
 from app.controllers.consultarDietas import ConsultaDietas
+from app.controllers.asignarDieta import AsignarDietas
 
 from app.validators.agregarEjerciciosV import CreateExerciseSchema
 from app.validators.rutinasValidate import CreateRoutineSchema
@@ -54,6 +55,7 @@ reporte_rutina = ReporteRutina()
 
 registro_dietas = AgregarDietas()
 consulta_dietas = ConsultaDietas()
+asignar_dieta = AsignarDietas()
 
 app = Flask(__name__)
 
@@ -683,4 +685,35 @@ def consultarDietasID(id):
             return jsonify({'status': 'error', "message": "Token invalido"}),406
     else:
         return jsonify({'status': 'No ha envido ningun token'}),406
+
+
+@app.route('/asignarDieta/<int:idDieta>/<int:id>', methods=['PUT'])
+def asignarDieta(idDieta, id):
+    if (request.headers.get('Authorization')):
+        validar = request.headers.get('Authorization')
+
+        validate = validacion(validar)
+
+        if validate:
+            if validate.get('user') == "admin":
+                id = str(id)
+                idDieta = str(idDieta)
+
+                retorno = asignar_dieta.asignar(idDieta, id)
+
+                # si el sistema devuelve un string es por que la rutina no existe
+                if isinstance(retorno, str):
+                    return jsonify({"status": "bad", "message": "No existe la dieta"}), 406
+
+                if retorno:
+                    return jsonify({"status": "ok"}), 200
+
+                else:
+                    return jsonify({"status": "bad", "message": "no existe el usuario"}), 400
+            else:
+                return jsonify({"status": "bad", "message": "no tiene permisos para acceder"}), 400
+        else:
+            return jsonify({'status': 'error', "message": "Token invalido"})
+    else:
+        return jsonify({'status': 'No ha envido ningun token'})
 
