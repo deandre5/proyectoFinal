@@ -121,7 +121,6 @@ class Dietas:
 
 
     def consultarId(self, id):
-        print("*-*-*-*-*-*-*",id)
         try:
             conexion = psycopg2.connect(database="dd1o1liu6nsqob", user="gvjdpzhyjsvfxs", password="5ffbbd36b7bf7d3ff6e7edb572b8667da3b15d4396b445f4e705f13c25f8d075",
                                         host="ec2-52-23-190-126.compute-1.amazonaws.com", port="5432")
@@ -172,6 +171,98 @@ class Dietas:
             print("Error in the conetion with the database", error)
             status = False
 
+        finally:
+            cursor.close()
+            conexion.close()
+            return status
+
+    def remover(self, id):
+        try:
+            conexion = psycopg2.connect(database="dd1o1liu6nsqob", user="gvjdpzhyjsvfxs", password="5ffbbd36b7bf7d3ff6e7edb572b8667da3b15d4396b445f4e705f13c25f8d075",
+                                        host="ec2-52-23-190-126.compute-1.amazonaws.com", port="5432")
+
+            cursor = conexion.cursor()
+
+            
+            sql = "DELETE FROM dietas WHERE id = %s"
+
+            cursor.execute(sql, (id,))
+            conexion.commit()
+
+           
+            """sql = "DELETE iddieta FROM personas WHERE iddieta = %s"
+
+            cursor.execute(sql, (id,))
+
+            conexion.commit()"""
+
+            status = True
+
+        except Exception as error:
+            print("Error in the connection with the database", error)
+            status = False
+
+        finally:
+            cursor.close()
+            conexion.close()
+            return status
+
+
+    def consultarDietaActualizar(self, nombre):
+        try:
+            conexion = psycopg2.connect(database="dd1o1liu6nsqob", user="gvjdpzhyjsvfxs", password="5ffbbd36b7bf7d3ff6e7edb572b8667da3b15d4396b445f4e705f13c25f8d075",
+                                        host="ec2-52-23-190-126.compute-1.amazonaws.com", port="5432")
+
+            cursor = conexion.cursor()
+
+            sql = "SELECT * FROM dietas WHERE nombre = %s"
+
+            cursor.execute(sql, (nombre,))
+            diccionario = cursor.fetchall()
+            conexion.commit()
+
+            print(diccionario)
+
+            if len(diccionario) > 1:
+                status = True
+            else:
+                status = False
+
+        except Exception as error:
+            print("Error in the conetion with the database", error)
+
+            status = False
+
+        finally:
+
+            cursor.close()
+            conexion.close()
+            return status
+
+    def actualizarDietas(self, id, nombre, categoria, descripcion):
+
+        try:
+            conexion = psycopg2.connect(database="dd1o1liu6nsqob", user="gvjdpzhyjsvfxs", password="5ffbbd36b7bf7d3ff6e7edb572b8667da3b15d4396b445f4e705f13c25f8d075",
+                                        host="ec2-52-23-190-126.compute-1.amazonaws.com", port="5432")
+
+            cursor = conexion.cursor()
+
+            sql = "UPDATE dietas SET nombre = %s, categoria = %s, descripcion = %s WHERE id = %s "
+
+            id = (id)
+            nombre = (nombre)
+            descripcion = (descripcion)
+            categoria = (categoria)
+
+            cursor.execute(sql, (nombre, categoria, descripcion, id))
+            conexion.commit()
+            # si la actualizacion fue exitosa el status se vuelve true
+            status = True
+
+        except Exception as error:
+            print("Error in the conetion with the database", error)
+            # si hay error se convierte en false
+            status = False
         finally:
             cursor.close()
             conexion.close()

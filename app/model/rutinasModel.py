@@ -436,6 +436,7 @@ class Rutinas:
                                         host="ec2-52-23-190-126.compute-1.amazonaws.com", port="5432")
 
             cursor = conexion.cursor()
+            
 
             sql = "DELETE FROM rutinas WHERE id= %s"
 

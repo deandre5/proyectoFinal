@@ -31,6 +31,8 @@ from app.controllers.ReporteRutina import ReporteRutina
 from app.controllers.registroDietas import AgregarDietas
 from app.controllers.consultarDietas import ConsultaDietas
 from app.controllers.asignarDieta import AsignarDietas
+from app.controllers.eliminarDieta import EliminarDietas
+from app.controllers.actualizarDieta import ActualizarDieta
 
 from app.validators.agregarEjerciciosV import CreateExerciseSchema
 from app.validators.rutinasValidate import CreateRoutineSchema
@@ -56,6 +58,9 @@ reporte_rutina = ReporteRutina()
 registro_dietas = AgregarDietas()
 consulta_dietas = ConsultaDietas()
 asignar_dieta = AsignarDietas()
+eliminar_dieta = EliminarDietas()
+actualizar_dieta = ActualizarDieta()
+
 
 app = Flask(__name__)
 
@@ -413,8 +418,6 @@ def registrarRutinas():
 @app.route('/actualizarRutina/<int:id>', methods=['PUT'])
 def actualizarRutina(id):
 
-    
-
     if request.headers.get('Authorization'):
         validar = request.headers.get('Authorization')
 
@@ -426,7 +429,6 @@ def actualizarRutina(id):
                 id = str(id)
 
                 content = request.get_json()
-                
 
                 validarRutina = rutinasSchema.load(content)
 
@@ -583,7 +585,6 @@ def reporteRutinas():
         return jsonify({'status': 'No ha envido ningun token'})
 
 
-
 def validacionToken(headers):
     token = headers.split(' ')
 
@@ -624,18 +625,17 @@ def registrarDietas():
                         return jsonify({"status": "Dieta registrada"}), 200
 
                     else:
-                        return jsonify({"status": "bad", "error":"Error"}),406
+                        return jsonify({"status": "bad", "error": "Error"}), 406
 
-                
                 except Exception as error:
                     tojson = str(error)
                     return jsonify({"status": "no es posible validar", "error": tojson}), 406
             else:
                 return jsonify({"status": "bad", "message": "no tiene permisos para acceder"}), 400
         else:
-            return jsonify({'status': 'error', "message": "Token invalido"}),406
+            return jsonify({'status': 'error', "message": "Token invalido"}), 406
     else:
-        return jsonify({'status': 'No ha envido ningun token'}),406
+        return jsonify({'status': 'No ha envido ningun token'}), 406
 
 
 @app.route('/consultarDietas', methods=['GET'])
@@ -649,18 +649,15 @@ def consultarDietas():
             retorno = consulta_dietas.consulta()
 
             if retorno:
-                return jsonify({'status': 'ok', "dietas":retorno}),200
-            
+                return jsonify({'status': 'ok', "dietas": retorno}), 200
+
             else:
                 return jsonify({'status': 'error'}), 400
 
-
-
         else:
-            return jsonify({'status': 'error', "message": "Token invalido"}),406
+            return jsonify({'status': 'error', "message": "Token invalido"}), 406
     else:
-        return jsonify({'status': 'No ha envido ningun token'}),406
-
+        return jsonify({'status': 'No ha envido ningun token'}), 406
 
 
 @app.route('/consultarDietas/<int:id>', methods=['GET'])
@@ -682,9 +679,9 @@ def consultarDietasID(id):
                 return jsonify({'status': 'error'}), 400
 
         else:
-            return jsonify({'status': 'error', "message": "Token invalido"}),406
+            return jsonify({'status': 'error', "message": "Token invalido"}), 406
     else:
-        return jsonify({'status': 'No ha envido ningun token'}),406
+        return jsonify({'status': 'No ha envido ningun token'}), 406
 
 
 @app.route('/asignarDieta/<int:idDieta>/<int:id>', methods=['PUT'])
@@ -717,3 +714,68 @@ def asignarDieta(idDieta, id):
     else:
         return jsonify({'status': 'No ha envido ningun token'})
 
+
+@app.route('/eliminarDietas/<int:id>', methods=['DELETE'])
+def eliminarDietas(id):
+    if (request.headers.get('Authorization')):
+        validar = request.headers.get('Authorization')
+
+        validate = validacion(validar)
+
+        if validate:
+            if validate.get('user') == "admin":
+                id = str(id)
+
+                retorno = eliminar_dieta.eliminar(id)
+
+                if retorno:
+                    return jsonify({"status": "ok"}), 200
+                else:
+                    return jsonify({"status": "bad", "message": "no existe la dieta a eliminar"}), 400
+
+            else:
+                return jsonify({"status": "bad", "message": "no tiene permisos para acceder"}), 400
+        else:
+            return jsonify({'status': 'error', "message": "Token invalido"})
+    else:
+        return jsonify({'status': 'No ha envido ningun token'})
+
+
+@app.route('/actualizarDietas/<int:id>', methods=['PUT'])
+def actualizarDietas(id):
+    if (request.headers.get('Authorization')):
+        validar = request.headers.get('Authorization')
+
+        validate = validacion(validar)
+
+        if validate:
+            if validate.get('user') == "admin":
+                id = str(id)
+
+                content = request.get_json()
+
+                try:
+
+                    validarJson = dietaSchema.load(content)
+
+                    retorno = actualizar_dieta.actualizar(id, content)
+
+                    if isinstance(retorno, str):
+
+                        return jsonify({"status": "bad", "message": "Nombre ya se encuentra registrado"}), 406
+
+                    if retorno:
+                        return jsonify({"status": "ok"}), 200
+                    else:
+                        return jsonify({"status": "bad"}), 400
+
+                except Exception as error:
+                    tojson = str(error)
+                    return jsonify({"status": "no es posible validar", "error": tojson}), 406
+
+            else:
+                return jsonify({"status": "bad", "message": "no tiene permisos para acceder"}), 400
+        else:
+            return jsonify({'status': 'error', "message": "Token invalido"})
+    else:
+        return jsonify({'status': 'No ha envido ningun token'})
