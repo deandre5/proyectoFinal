@@ -33,6 +33,7 @@ from app.controllers.consultarDietas import ConsultaDietas
 from app.controllers.asignarDieta import AsignarDietas
 from app.controllers.eliminarDieta import EliminarDietas
 from app.controllers.actualizarDieta import ActualizarDieta
+from app.controllers.reporteDietas import ReporteDietas
 
 from app.validators.agregarEjerciciosV import CreateExerciseSchema
 from app.validators.rutinasValidate import CreateRoutineSchema
@@ -60,7 +61,7 @@ consulta_dietas = ConsultaDietas()
 asignar_dieta = AsignarDietas()
 eliminar_dieta = EliminarDietas()
 actualizar_dieta = ActualizarDieta()
-
+reporte_dietas = ReporteDietas()
 
 app = Flask(__name__)
 
@@ -772,6 +773,28 @@ def actualizarDietas(id):
                 except Exception as error:
                     tojson = str(error)
                     return jsonify({"status": "no es posible validar", "error": tojson}), 406
+
+            else:
+                return jsonify({"status": "bad", "message": "no tiene permisos para acceder"}), 400
+        else:
+            return jsonify({'status': 'error', "message": "Token invalido"})
+    else:
+        return jsonify({'status': 'No ha envido ningun token'})
+
+
+@app.route('/reporteDietas', methods=['GET'])
+def reporteDietas():
+
+    if(request.headers.get('Authorization')):
+        validar = request.headers.get('Authorization')
+
+        validate = validacion(validar)
+
+        if validate:
+            if validate.get('user') == "admin":
+
+                retorno = reporte_dietas.generarReporte()
+                return Response(retorno, mimetype="application/ms-excel", headers={"content-Disposition": "attachment; filename=reporteDietas.csv"})
 
             else:
                 return jsonify({"status": "bad", "message": "no tiene permisos para acceder"}), 400
