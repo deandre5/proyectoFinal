@@ -18,3 +18,7 @@ class consulta:
         # recibe la informacion a consultar y la devuelve
         diccionario = ejercicios.ConsultaId(id)
         return diccionario
+
+    def ejercicios(self):
+        diccionarios = ejercicios.Ejercicios()
+        return diccionarios

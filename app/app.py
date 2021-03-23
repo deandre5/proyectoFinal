@@ -802,3 +802,27 @@ def reporteDietas():
             return jsonify({'status': 'error', "message": "Token invalido"})
     else:
         return jsonify({'status': 'No ha envido ningun token'})
+
+
+@app.route('/ejercicios')
+def ejercicios():
+
+    if(request.headers.get('Authorization')):
+        validar = request.headers.get('Authorization')
+
+        validate = validacion(validar)
+
+        if validate:
+
+            ejercicios = consulta_Ejercicios.ejercicios()
+
+            if ejercicios:
+                return jsonify({"status": "OK", "Ejercicios": ejercicios}),200
+            else:
+                return jsonify({"status": "No hay ejercicios registrados"}),400
+
+        else:
+            return jsonify({'status': 'error', "message": "Token invalido"}),406
+    else:
+        return jsonify({'status': 'No ha envido ningun token'}),406
+
