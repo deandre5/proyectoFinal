@@ -15,7 +15,7 @@ class CreateRoutineSchema(Schema):
     nombre = fields.String(required=True, validate=validate.Length(
         min=1, max=45), data_key='nombre')
     descripcion = fields.String(required=True, validate=validate.Length(
-        min=1, max=258), data_key='descripcion')
+        min=1, max=1000), data_key='descripcion')
     intensidad = fields.String(required=True, validate=validate.Length(
         min=1, max=45), data_key='intensidad')
     categoria = fields.String(required=True, validate=validate.OneOf(
