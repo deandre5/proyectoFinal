@@ -1,4 +1,17 @@
 from app.model.ejerciciosModel import Ejercicios
+from app.helpers.helpers import allowed_file
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+import datetime
+import bcrypt
+from werkzeug.utils import secure_filename
+
+cloudinary.config(
+    cloud_name='hdjsownnk',
+    api_key='926599253344788',
+    api_secret='I8rBOy-rnozmrxhNL_Lg7hqtj7s'
+)
 
 
 ejercicios = Ejercicios()
@@ -7,14 +20,10 @@ ejercicios = Ejercicios()
 class agregar():
 
     # metodo que recibe la informacion del ejercicio para su registro
-    def agregarEjercicios(self, nombre, descripcion, tipo, filename):
+    def agregarEjercicios(self,content, file):
         try:
-            nombre = str(nombre)
-            descripcion = str(descripcion)
-            imagen = str(filename)
-
-            tipo = str(tipo)
-
+            
+            
             # se consultan todos los ejercicios, despues de esto se le asigna el id al ejercicio
             consulta = ejercicios.consultar()
 
@@ -26,10 +35,40 @@ class agregar():
             else:
                 id_bd = 1
 
-            # se envian los datos a la base de datos  para su registro y se devuelve la respuesta
-            status = ejercicios.insert(
-                id_bd, nombre, descripcion, imagen, tipo)
-            return status
+
+            if allowed_file(file.filename):
+
+                descripcion = content['descripcion']
+                tipo = content['tipo']
+                nombre = content['nombre']
+
+
+                filename = secure_filename(file.filename)
+
+                dia = datetime.datetime.utcnow()
+                salt = bcrypt.gensalt()
+                hash = bcrypt.hashpw(bytes(str(dia), encoding='utf-8'), salt)
+
+                h = str(hash).split('/')
+
+                if (len(h) > 2):
+                    t = h[1]+h[2]
+                else:
+                    t = h[0]
+
+                filename = h[0]
+
+                filename = str(t)
+
+                cloudinary.uploader.upload(file, public_id=filename)
+                imagen = cloudinary.utils.cloudinary_url(filename)
+
+                # se envian los datos a la base de datos  para su registro y se devuelve la respuesta
+                status = ejercicios.insert(
+                id_bd, nombre, descripcion, imagen[0], tipo)
+                return status
+            else:
+                return int(0)
         except Exception as error:
             print(error)
             status = False

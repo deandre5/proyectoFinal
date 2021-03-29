@@ -4,16 +4,11 @@ from flask import Flask, jsonify, request, render_template, Response
 from flask_cors import CORS
 import datetime
 from werkzeug.utils import secure_filename
-import cloudinary
-import cloudinary.uploader
-import cloudinary.api
+from app.helpers.helpers import KEY_TOKEN_AUTH, validacion, validacionToken
 import bcrypt
-import jwt
 import io
 import xlwt
 
-
-from app.config.config import KEY_TOKEN_AUTH
 
 from app.controllers.consultaEjercicios import consulta
 
@@ -66,56 +61,10 @@ reporte_dietas = ReporteDietas()
 app = Flask(__name__)
 
 # configuracion de la api cloudinary, se ingresan las credenciales dadas por la api
-cloudinary.config(
-    cloud_name='hdjsownnk',
-    api_key='926599253344788',
-    api_secret='I8rBOy-rnozmrxhNL_Lg7hqtj7s'
-)
 
 
 CORS(app)
 
-app.secret_key = 'esto-es-una-clave-muy-secreta'
-
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
-
-# funcion que crea un token, teniendo un admin como usuario
-
-
-@app.route('/admin')
-def index():
-    encode_jwt = jwt.encode({'exp': datetime.datetime.utcnow(
-    ) + datetime.timedelta(seconds=1500), "user": "admin"}, KEY_TOKEN_AUTH, algorithm='HS256')
-
-    print(encode_jwt)
-
-    return jsonify({"status": "ok", "token": encode_jwt})
-
-
-# funcion que crea un token, teniendo un user como usuario
-@app.route('/user')
-def user():
-    encode_jwt = jwt.encode({'exp': datetime.datetime.utcnow(
-    ) + datetime.timedelta(seconds=1500), "user": "user"}, KEY_TOKEN_AUTH, algorithm='HS256')
-
-    print(encode_jwt)
-
-    return jsonify({"status": "ok", "token": encode_jwt})
-
-
-# funcion que valida el token
-def validacion(headers):
-    token = headers.split(' ')
-
-    try:
-        # se devulve la informacion util del usuario
-        data = jwt.decode(token[1], KEY_TOKEN_AUTH, algorithms=['HS256'])
-        status = True
-        print(data)
-        return data
-    except:
-        status = False
-        return status
 
 # metodo que tiene un id como parametro, permitiendo la consulta de un ejercicio en especifico mediante ese id
 
@@ -174,10 +123,6 @@ def consultaEjercicios():
         return jsonify({'status': 'No ha envido ningun token'}), 400
 
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 # metodo que recibe mediante post un json, luego valida y envia a la bd para registrar un ejercicio
 
 
@@ -192,49 +137,29 @@ def agregarEjercicios():
             if validate.get('user') == "admin":
                 try:
 
-                    # realiza las validaciones al form que recibe
-                    validar = exerciseSchema.validate(request.form)
+                    if len(request.files):
 
-                    nombre = request.form['nombre']
-                    descripcion = request.form['descripcion']
-                    tipo = request.form['tipo']
+                        # realiza las validaciones al form que recibe
+                        validar = exerciseSchema.validate(request.form)
 
-                    # variable que obtiene como valor la imagen enviada desde el cliente
-                    f = request.files['imagen']
+                        content = request.form
 
-                    if allowed_file(f.filename):
-
-                        # se encarga de revizar que el nombre del archivo no sea un problema para nuestro programa
-                        filename = secure_filename(f.filename)
-
-                        # se encripta el dia actual, la hora y se genera un salt, luego el salt se divide en partes mediante el /
-                        dia = datetime.datetime.utcnow()
-                        salt = bcrypt.gensalt()
-                        hash = bcrypt.hashpw(
-                            bytes(str(dia), encoding='utf-8'), salt)
-                        h = str(hash).split('/')
-
-                        # se reviza el len de h para poder determinar su nombe proviniente del hash
-                        if len(h) > 2:
-                            t = h[1]+h[2]
-                        else:
-                            t = h[0]
-
-                        filename = str(t)
-
-                        # se llama a la api y se registra la imagen y el nombre al cual le hicimos hash, luego obtenemos la url para enviarla al controller
-                        cloudinary.uploader.upload(f, public_id=filename)
-                        url = cloudinary.utils.cloudinary_url(filename)
+                        # variable que obtiene como valor la imagen enviada desde el cliente
+                        file = request.files['imagen']
 
                         # se envian los datos al controller para su registro
                         retorno = agregar_ejercicios.agregarEjercicios(
-                            nombre, descripcion, tipo, url[0])
+                            content, file)
 
                         # se examina si se registro la informacion en la base de datos
+
+                        if retorno == 0:
+                            return jsonify({'status': 'Porfavor ingrese un archivo valido'}), 400
                         if retorno:
 
                             return jsonify({'status': 'ok'}), 200
                         else:
+                            nombre = request["nombre"]
                             # se examina si el nombre esta repetido en la base de datos
                             status = agregar_ejercicios.consultar(nombre)
                             if status:
@@ -243,7 +168,7 @@ def agregarEjercicios():
                                 return jsonify({'status': 'error', "message": "Error"}), 400
 
                     else:
-                        return jsonify({'status': 'error', "message": "Ingrese un archivo compatible"}), 400
+                        return jsonify({'status': 'Error, No ha subido ninguna imagen'}), 400
 
                 except Exception as error:
                     tojson = str(error)
@@ -273,59 +198,43 @@ def actualizarEjercicio(id):
                     # realiza las validaciones al form que recibe
                     validar = exerciseSchema.validate(request.form)
 
-                    nombre = request.form['nombre']
-                    descripcion = request.form['descripcion']
-                    tipo = request.form['tipo']
+                    content = request.form
 
                     # si el len de los archivos enviados es mayor que 0, guarda la imagen y envia la nueva url para su registro en la base de datos
                     if len(request.files) > 0:
                         # variable que obtiene como valor la imagen enviada desde el cliente
-                        f = request.files['imagen']
-                        if allowed_file(f.filename):
 
-                            # se encarga de revizar que el nombre del archivo no sea un problema para nuestro programa
+                        file = request.files['imagen']
 
-                            filename = secure_filename(f.filename)
+                        actualizar = actualizar_ejercicios.actualizarConfoto(
+                            id, content, file)
 
-                            # se encripta el dia actual, la hora y se genera un salt, luego el salt se divide en partes mediante el /
-                            dia = datetime.datetime.utcnow()
-                            salt = bcrypt.gensalt()
-                            hash = bcrypt.hashpw(
-                                bytes(str(dia), encoding='utf-8'), salt)
-                            h = str(hash).split('/')
+                        if actualizar == 0:
+                            return jsonify({"status": "Ingrese un archivo valido"}), 400
 
-                            # se reviza el len de h para poder determinar su nombe proviniente del hash
-                            if len(h) > 2:
-                                t = h[1]+h[2]
-                            else:
-                                t = h[0]
+                        if isinstance(actualizar, str):
+                            return jsonify({"status": "Ya se encuentra registrado el ejercicio"}), 400
 
-                            filename = str(t)
-                            # se llama a la api y se registra la imagen y el nombre al cual le hicimos hash, luego obtenemos la url para enviarla al controller
-                            cloudinary.uploader.upload(f, public_id=filename)
-                            url = cloudinary.utils.cloudinary_url(filename)
+                        if actualizar:
+                            return jsonify({"status": "OK"}), 200
 
-                            # se envian los datos al controller para su registro
-                            retorno = actualizar_ejercicios.actualizar(
-                                nombre, descripcion, tipo, id, url[0])
                         else:
-                            return jsonify({'status': 'error', "message": "Ingrese un archivo compatible"}), 400
+                            return jsonify({"status": "Error, no existe el ejercicio"}), 400
 
                     else:
-                        # si no se envian imagenes, se recupera al anterior url y se envia al controller para su registro
-                        f = request.form['url']
-                        retorno = actualizar_ejercicios.actualizar(
-                            nombre, descripcion, tipo, id, f)
 
-                    # si retorno es una instancia de string nos damos cuenta que el nombre esta registrado
-                    if isinstance(retorno, str):
+                        actualizar = actualizar_ejercicios.actualizarSinFoto(
+                            id, content)
 
-                        return jsonify({"status": "bad", "message": "Nombre ya se encuentra registrado"}), 406
+                        if isinstance(actualizar, str):
+                            return jsonify({"status": "Ya se encuentra registrado el ejercicio"}), 400
 
-                    if retorno:
-                        return jsonify({"status": "ok"}), 200
-                    else:
-                        return jsonify({"status": "bad"}), 400
+                        if actualizar:
+                            return jsonify({"status": "OK"}), 200
+
+                        else:
+                            return jsonify({"status": "Error, no existe el ejercicio"})
+
                 except Exception as error:
                     tojson = str(error)
                     print(error)
@@ -586,20 +495,6 @@ def reporteRutinas():
         return jsonify({'status': 'No ha envido ningun token'})
 
 
-def validacionToken(headers):
-    token = headers.split(' ')
-
-    try:
-        # se devulve la informacion util del usuario
-        data = jwt.decode(token[1], KEY_TOKEN_AUTH, algorithms=['HS256'])
-        status = True
-        print(data)
-        return data
-    except:
-        status = False
-        return status
-
-
 @app.route('/registrarDietas', methods=['POST'])
 def registrarDietas():
 
@@ -817,12 +712,11 @@ def ejercicios():
             ejercicios = consulta_Ejercicios.ejercicios()
 
             if ejercicios:
-                return jsonify({"status": "OK", "Ejercicios": ejercicios}),200
+                return jsonify({"status": "OK", "Ejercicios": ejercicios}), 200
             else:
-                return jsonify({"status": "No hay ejercicios registrados"}),400
+                return jsonify({"status": "No hay ejercicios registrados"}), 400
 
         else:
-            return jsonify({'status': 'error', "message": "Token invalido"}),406
+            return jsonify({'status': 'error', "message": "Token invalido"}), 406
     else:
-        return jsonify({'status': 'No ha envido ningun token'}),406
-
+        return jsonify({'status': 'No ha envido ningun token'}), 406
